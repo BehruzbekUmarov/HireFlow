@@ -21,8 +21,6 @@ public class AppDbContext : DbContext, IAppDbContext
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		// Each entity's table mapping lives in its own Configuration class
-		// (next to this file) instead of one giant OnModelCreating method.
 		modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 	}
 }

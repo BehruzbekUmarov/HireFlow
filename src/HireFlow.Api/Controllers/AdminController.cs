@@ -8,7 +8,7 @@ namespace HireFlow.Api.Controllers;
 
 [ApiController]
 [Route("api/admin")]
-[Authorize(Roles = "Admin")]  // entire controller is Admin-only
+[Authorize(Roles = "Admin")] 
 public class AdminController : ControllerBase
 {
 	private readonly IAdminService _adminService;
@@ -16,7 +16,6 @@ public class AdminController : ControllerBase
 	public AdminController(IAdminService adminService)
 		=> _adminService = adminService;
 
-	// GET api/admin/users
 	[HttpGet("users")]
 	public async Task<ActionResult<PagedResult<UserSummaryDto>>> GetUsers(
 		[FromQuery] int pageNumber = 1,
@@ -26,7 +25,6 @@ public class AdminController : ControllerBase
 		return Ok(result);
 	}
 
-	// GET api/admin/companies
 	[HttpGet("companies")]
 	public async Task<ActionResult<PagedResult<CompanySummaryDto>>> GetCompanies(
 		[FromQuery] int pageNumber = 1,
@@ -36,7 +34,6 @@ public class AdminController : ControllerBase
 		return Ok(result);
 	}
 
-	// PATCH api/admin/companies/5/approve
 	[HttpPatch("companies/{id}/approve")]
 	public async Task<IActionResult> ApproveCompany(long id)
 	{
@@ -51,7 +48,6 @@ public class AdminController : ControllerBase
 		}
 	}
 
-	// PATCH api/admin/companies/5/suspend
 	[HttpPatch("companies/{id}/suspend")]
 	public async Task<IActionResult> SuspendCompany(long id)
 	{

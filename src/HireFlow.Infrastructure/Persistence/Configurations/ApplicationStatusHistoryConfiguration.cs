@@ -8,16 +8,10 @@ public class ApplicationStatusHistoryConfiguration : IEntityTypeConfiguration<Ap
 {
 	public void Configure(EntityTypeBuilder<ApplicationStatusHistory> builder)
 	{
-		// ---------- Table ----------
 		builder.ToTable("application_status_histories");
 
-		// ---------- Primary key ----------
 		builder.HasKey(h => h.Id);
 
-		builder.Property(h => h.Id)
-			   .ValueGeneratedOnAdd();
-
-		// ---------- Properties ----------
 		builder.Property(h => h.OldStatus)
 			   .HasConversion<string>()
 			   .HasMaxLength(20)
@@ -30,9 +24,5 @@ public class ApplicationStatusHistoryConfiguration : IEntityTypeConfiguration<Ap
 
 		builder.Property(h => h.ChangedAt)
 			   .IsRequired();
-
-		// ---------- Relationships ----------
-		// JobApplication → StatusHistory is configured in JobApplicationConfiguration
-		// Nothing extra needed here — EF Core picks it up automatically
 	}
 }

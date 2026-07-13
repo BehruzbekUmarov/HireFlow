@@ -1,4 +1,4 @@
-﻿namespace HireFlow.Application.DTOs.Auth;
+﻿namespace HireFlow.Application.DTOs.Auth.Requests;
 
 public class RefreshRequest
 {

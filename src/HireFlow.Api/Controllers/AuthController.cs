@@ -1,4 +1,5 @@
-﻿using HireFlow.Application.DTOs.Auth;
+﻿using HireFlow.Application.DTOs.Auth.Requests;
+using HireFlow.Application.DTOs.Auth.Responses;
 using HireFlow.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -14,23 +15,16 @@ public class AuthController : ControllerBase
 	public AuthController(IAuthService authService)
 		=> _authService = authService;
 
-	[HttpPost("register")]
-	public async Task<ActionResult<AuthResponse>> Register(RegisterRequest request)
-	{
-		var result = await _authService.RegisterAsync(request);
-		return Ok(result);
-	}
-
 	[HttpPost("register/freelancer")]
-	public async Task<ActionResult<AuthResponse>> RegisterFreelancer(
+	public async Task<ActionResult<RegisterResponse>> RegisterFreelancer(
 	RegisterFreelancerRequest request)
 	{
 		var result = await _authService.RegisterFreelancerAsync(request);
-		return Ok(result);
+		return Ok(result); // 200 — account created, go log in
 	}
 
 	[HttpPost("register/company")]
-	public async Task<ActionResult<AuthResponse>> RegisterCompany(
+	public async Task<ActionResult<RegisterResponse>> RegisterCompany(
 		RegisterCompanyRequest request)
 	{
 		var result = await _authService.RegisterCompanyAsync(request);
@@ -39,7 +33,7 @@ public class AuthController : ControllerBase
 
 	[HttpPost("login")]
 	[EnableRateLimiting("auth")]
-	public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
+	public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)   
 	{
 		var result = await _authService.LoginAsync(request);
 		if (result is null)
@@ -49,7 +43,7 @@ public class AuthController : ControllerBase
 	}
 
 	[HttpPost("refresh")]
-	public async Task<ActionResult<AuthResponse>> Refresh(RefreshRequest request)
+	public async Task<ActionResult<RefreshResponse>> Refresh(RefreshRequest request)
 	{
 		var result = await _authService.RefreshAsync(request.RefreshToken);
 		if (result is null)

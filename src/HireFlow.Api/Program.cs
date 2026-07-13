@@ -1,3 +1,4 @@
+using HireFlow.Api.Extensions;
 using HireFlow.Application;
 using HireFlow.Infrastructure.Extensions;
 using HireFlow.Infrastructure.Security;
@@ -89,12 +90,18 @@ if (app.Environment.IsDevelopment())
 	app.UseSwaggerUI();
 }
 
-app.UseExceptionHandler();
+app.UseErrorHandler();
+
 app.UseHttpsRedirection();
+
 app.UseCors("AllowAngular");
+
 app.UseRateLimiter();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

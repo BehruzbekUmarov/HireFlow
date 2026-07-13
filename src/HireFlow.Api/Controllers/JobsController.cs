@@ -16,25 +16,22 @@ public class JobsController : ControllerBase
 	public JobsController(IJobService jobService)
 		=> _jobService = jobService;
 
-	// GET api/jobs?keyword=developer&category=Backend&pageNumber=1
-	// Public — anyone can browse jobs
 	[HttpGet]
-	public async Task<ActionResult<PagedResult<JobSummaryDto>>> Search([FromQuery] JobFilterRequest filter)
+	public async Task<ActionResult<PagedResult<JobSummaryDto>>> Search(
+		[FromQuery] JobFilterRequest filter)
 	{
 		var result = await _jobService.SearchAsync(filter);
 		return Ok(result);
 	}
 
-	// GET api/jobs/5
 	[HttpGet("{id}")]
 	public async Task<ActionResult<JobDetailDto>> GetById(long id)
 	{
 		var result = await _jobService.GetByIdAsync(id);
-		if (result is null) return NotFound(new { message = "Job not found." });
+		if (result is null) return NotFound(new { message = $"Job with id '{id}' was not found." });
 		return Ok(result);
 	}
 
-	// GET api/jobs/my — company sees their own listings
 	[HttpGet("my")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<PagedResult<JobSummaryDto>>> GetMyJobs(
@@ -42,73 +39,43 @@ public class JobsController : ControllerBase
 		[FromQuery] int pageSize = 10)
 	{
 		var companyId = GetCompanyId();
-		if (companyId is null) return Forbid();
-
-		var result = await _jobService.GetByCompanyAsync(companyId.Value, pageNumber, pageSize);
+		var result = await _jobService.GetByCompanyAsync(companyId, pageNumber, pageSize);
 		return Ok(result);
 	}
 
-	// POST api/jobs — company creates a job
 	[HttpPost]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<JobDetailDto>> Create(CreateJobRequest request)
 	{
 		var companyId = GetCompanyId();
-		if (companyId is null) return Forbid();
-
-		try
-		{
-			var result = await _jobService.CreateAsync(companyId.Value, request);
-			return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-		}
-		catch (InvalidOperationException ex)
-		{
-			return BadRequest(new { message = ex.Message });
-		}
+		var result = await _jobService.CreateAsync(companyId, request);
+		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
 	}
 
-	// PUT api/jobs/5 — company updates their job
 	[HttpPut("{id}")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<JobDetailDto>> Update(long id, UpdateJobRequest request)
 	{
 		var companyId = GetCompanyId();
-		if (companyId is null) return Forbid();
-
-		try
-		{
-			var result = await _jobService.UpdateAsync(id, companyId.Value, request);
-			return Ok(result);
-		}
-		catch (InvalidOperationException ex)
-		{
-			return BadRequest(new { message = ex.Message });
-		}
+		var result = await _jobService.UpdateAsync(id, companyId, request);
+		return Ok(result);
 	}
 
-	// PATCH api/jobs/5/close — company closes a job listing
 	[HttpPatch("{id}/close")]
 	[Authorize(Roles = "Company")]
 	public async Task<IActionResult> Close(long id)
 	{
 		var companyId = GetCompanyId();
-		if (companyId is null) return Forbid();
-
-		try
-		{
-			await _jobService.CloseAsync(id, companyId.Value);
-			return NoContent();
-		}
-		catch (InvalidOperationException ex)
-		{
-			return BadRequest(new { message = ex.Message });
-		}
+		await _jobService.CloseAsync(id, companyId);
+		return NoContent();
 	}
 
-	// Helper — reads CompanyId claim from the JWT
-	private long? GetCompanyId()
+	private long GetCompanyId()
 	{
 		var claim = User.FindFirst("CompanyId")?.Value;
-		return long.TryParse(claim, out var id) ? id : null;
+		if (!long.TryParse(claim, out var id))
+			throw new Domain.Exceptions.ForbiddenException(
+				"Company profile not found in token.");
+		return id;
 	}
 }

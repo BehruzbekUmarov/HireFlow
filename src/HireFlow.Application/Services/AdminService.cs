@@ -1,6 +1,7 @@
 ﻿using HireFlow.Application.DTOs.Admin;
 using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.Interfaces;
+using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -74,7 +75,7 @@ public class AdminService : IAdminService
 	public async Task ApproveCompanyAsync(long companyId)
 	{
 		var company = await _db.Companies.FindAsync(companyId)
-			?? throw new InvalidOperationException("Company not found.");
+			?? throw new NotFoundException("Company", companyId);
 
 		company.IsApproved = true;
 		await _db.SaveChangesAsync();
@@ -83,7 +84,7 @@ public class AdminService : IAdminService
 	public async Task SuspendCompanyAsync(long companyId)
 	{
 		var company = await _db.Companies.FindAsync(companyId)
-			?? throw new InvalidOperationException("Company not found.");
+			?? throw new NotFoundException("Company", companyId);
 
 		company.IsApproved = false;
 		await _db.SaveChangesAsync();

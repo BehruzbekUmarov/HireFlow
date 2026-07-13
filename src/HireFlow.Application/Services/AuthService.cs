@@ -1,6 +1,7 @@
 ﻿using HireFlow.Application.DTOs.Auth;
 using HireFlow.Application.Interfaces;
 using HireFlow.Domain.Entities;
+using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +33,7 @@ public class AuthService : IAuthService
 			.AnyAsync(u => u.Email == request.Email.ToLowerInvariant());
 
 		if (emailTaken)
-			throw new InvalidOperationException("Email is already registered.");
+			throw new ConflictException("Email is already registered.");
 
 		var user = new User
 		{
@@ -43,7 +44,6 @@ public class AuthService : IAuthService
 			CreatedAt = DateTime.UtcNow
 		};
 
-		// If registering as Company, auto-create the linked Company profile
 		if (request.Role == Domain.Enums.UserRole.Company)
 		{
 			user.Company = new Company
@@ -83,7 +83,6 @@ public class AuthService : IAuthService
 		if (stored is null || stored.Revoked || stored.ExpiresAt < DateTime.UtcNow)
 			return null;
 
-		// Rotate — revoke old token, issue a new pair
 		stored.Revoked = true;
 		await _db.SaveChangesAsync();
 

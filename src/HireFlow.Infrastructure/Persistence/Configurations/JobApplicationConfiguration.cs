@@ -51,7 +51,7 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
 		builder.HasOne(a => a.User)
 			   .WithMany(u => u.JobApplications)
 			   .HasForeignKey(a => a.UserId)
-			   .OnDelete(DeleteBehavior.Cascade);
+			   .OnDelete(DeleteBehavior.NoAction);
 		// Cascade: if a user is deleted, their applications are deleted too
 
 		// JobApplication → StatusHistory:

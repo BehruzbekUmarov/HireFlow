@@ -3,6 +3,7 @@ using HireFlow.Application.DTOs.JobApplication;
 using HireFlow.Application.Interfaces;
 using HireFlow.Domain.Entities;
 using HireFlow.Domain.Enums;
+using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,18 +21,16 @@ public class JobApplicationService : IJobApplicationService
 	public async Task<JobApplicationDto> SubmitAsync(long jobId, long userId, SubmitApplicationRequest request)
 	{
 		var job = await _db.Jobs.FindAsync(jobId)
-			?? throw new InvalidOperationException("Job not found.");
+			?? throw new NotFoundException("job", jobId);
 
 		if (!job.IsActive)
-			throw new InvalidOperationException("This job is no longer accepting applications.");
+			throw new InvalidOperationDomainException("This job is no longer accepting applications.");
 
-		// Check duplicate — even though the DB has a unique index,
-		// we catch it here first to return a friendly message
 		var alreadyApplied = await _db.JobApplications
 			.AnyAsync(a => a.JobId == jobId && a.UserId == userId);
 
 		if (alreadyApplied)
-			throw new InvalidOperationException("You have already applied to this job.");
+			throw new ConflictException("You have already applied to this job.");
 
 		var application = new JobApplication
 		{
@@ -49,30 +48,28 @@ public class JobApplicationService : IJobApplicationService
 		return await GetDtoAsync(application.Id);
 	}
 
-	public async Task<JobApplicationDto> ChangeStatusAsync(long applicationId, long companyId, ApplicationStatus newStatus)
+	public async Task<JobApplicationDto> ChangeStatusAsync(
+		long applicationId, long companyId, ApplicationStatus newStatus)
 	{
 		var application = await _db.JobApplications
 			.Include(a => a.Job)
 			.FirstOrDefaultAsync(a => a.Id == applicationId)
-			?? throw new InvalidOperationException("Application not found.");
+			?? throw new NotFoundException("Application", applicationId);
 
-		// Verify this company owns the job the application is for
 		if (application.Job!.CompanyId != companyId)
-			throw new InvalidOperationException("You don't have permission to update this application.");
+			throw new ForbiddenException("You can only manage applications for your own job listings.");
 
-		// Validate the status transition
 		var allowed = application.Status switch
 		{
 			ApplicationStatus.Pending => newStatus is ApplicationStatus.Reviewed or ApplicationStatus.Rejected,
 			ApplicationStatus.Reviewed => newStatus is ApplicationStatus.Accepted or ApplicationStatus.Rejected,
-			_ => false // Accepted and Rejected are terminal — no further changes
+			_ => false
 		};
 
 		if (!allowed)
-			throw new InvalidOperationException(
-				$"Cannot change status from {application.Status} to {newStatus}.");
+			throw new InvalidOperationDomainException(
+				$"Cannot change status from '{application.Status}' to '{newStatus}'.");
 
-		// Record history before changing
 		_db.ApplicationStatusHistories.Add(new ApplicationStatusHistory
 		{
 			ApplicationId = application.Id,
@@ -91,12 +88,11 @@ public class JobApplicationService : IJobApplicationService
 
 	public async Task<PagedResult<JobApplicationDto>> GetByJobAsync(long jobId, long companyId, int pageNumber, int pageSize)
 	{
-		// Verify the company owns this job
-		var jobExists = await _db.Jobs
-			.AnyAsync(j => j.Id == jobId && j.CompanyId == companyId);
+		var job = await _db.Jobs.FindAsync(jobId)
+			?? throw new NotFoundException("Job", jobId);
 
-		if (!jobExists)
-			throw new InvalidOperationException("Job not found or you don't have permission.");
+		if (job.CompanyId != companyId)
+			throw new ForbiddenException("You can only view applications for your own job listings.");
 
 		var total = await _db.JobApplications.CountAsync(a => a.JobId == jobId);
 

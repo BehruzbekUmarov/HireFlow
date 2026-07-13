@@ -2,6 +2,7 @@
 using HireFlow.Application.DTOs.Job;
 using HireFlow.Application.Interfaces;
 using HireFlow.Domain.Entities;
+using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public class JobService : IJobService
 	public async Task<JobDetailDto> CreateAsync(long companyId, CreateJobRequest request)
 	{
 		var company = await _db.Companies.FindAsync(companyId)
-			?? throw new InvalidOperationException("Company not found.");
+			?? throw new NotFoundException($"Company not found {companyId}");
 
 		if (!company.IsApproved)
 			throw new InvalidOperationException("Your company must be approved before posting jobs.");
@@ -44,8 +45,11 @@ public class JobService : IJobService
 
 	public async Task<JobDetailDto> UpdateAsync(long jobId, long companyId, UpdateJobRequest request)
 	{
-		var job = await _db.Jobs.FirstOrDefaultAsync(j => j.Id == jobId && j.CompanyId == companyId)
-			?? throw new InvalidOperationException("Job not found or you don't have permission.");
+		var job = await _db.Jobs.FirstOrDefaultAsync(j => j.Id == jobId)
+			?? throw new NotFoundException("Job", jobId);
+
+		if (job.CompanyId != companyId)
+			throw new ForbiddenException("You can only edit your own job listings.");
 
 		job.Title = request.Title.Trim();
 		job.Description = request.Description.Trim();
@@ -61,8 +65,11 @@ public class JobService : IJobService
 
 	public async Task CloseAsync(long jobId, long companyId)
 	{
-		var job = await _db.Jobs.FirstOrDefaultAsync(j => j.Id == jobId && j.CompanyId == companyId)
-			?? throw new InvalidOperationException("Job not found or you don't have permission.");
+		var job = await _db.Jobs.FirstOrDefaultAsync(j => j.Id == jobId)
+			?? throw new NotFoundException("Job", jobId);
+
+		if (job.CompanyId != companyId)
+			throw new ForbiddenException("You can only close your own job listings.");
 
 		job.IsActive = false;
 		job.UpdatedAt = DateTime.UtcNow;
@@ -85,7 +92,6 @@ public class JobService : IJobService
 			.Where(j => j.IsActive)
 			.AsQueryable();
 
-		// Apply filters only when provided
 		if (!string.IsNullOrWhiteSpace(filter.Keyword))
 			query = query.Where(j =>
 				j.Title.Contains(filter.Keyword) ||
@@ -103,20 +109,18 @@ public class JobService : IJobService
 		if (filter.MaxSalary.HasValue)
 			query = query.Where(j => j.Salary <= filter.MaxSalary);
 
-		// Sorting
 		query = filter.SortBy switch
 		{
 			"Salary" => filter.SortOrder == "asc"
-							? query.OrderBy(j => j.Salary)
-							: query.OrderByDescending(j => j.Salary),
+				? query.OrderBy(j => j.Salary)
+				: query.OrderByDescending(j => j.Salary),
 			"Title" => filter.SortOrder == "asc"
-							? query.OrderBy(j => j.Title)
-							: query.OrderByDescending(j => j.Title),
-			_ => query.OrderByDescending(j => j.CreatedAt) // default: newest first
+				? query.OrderBy(j => j.Title)
+				: query.OrderByDescending(j => j.Title),
+			_ => query.OrderByDescending(j => j.CreatedAt)
 		};
 
 		var total = await query.CountAsync();
-
 		var items = await query
 			.Skip((filter.PageNumber - 1) * filter.PageSize)
 			.Take(filter.PageSize)
@@ -176,7 +180,6 @@ public class JobService : IJobService
 		};
 	}
 
-	// Private helper — builds the full detail DTO in one query
 	private async Task<JobDetailDto> GetDetailDtoAsync(long jobId)
 	{
 		return await _db.Jobs

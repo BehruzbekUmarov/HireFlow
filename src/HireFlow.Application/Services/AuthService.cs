@@ -1,6 +1,7 @@
 ﻿using HireFlow.Application.DTOs.Auth;
 using HireFlow.Application.Interfaces;
 using HireFlow.Domain.Entities;
+using HireFlow.Domain.Enums;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -57,6 +58,55 @@ public class AuthService : IAuthService
 		_db.Users.Add(user);
 		await _db.SaveChangesAsync();
 
+		return await IssueTokensAsync(user);
+	}
+
+	// AuthService.cs
+	public async Task<AuthResponse> RegisterFreelancerAsync(RegisterFreelancerRequest request)
+	{
+		var emailTaken = await _db.Users
+			.AnyAsync(u => u.Email == request.Email.ToLowerInvariant());
+		if (emailTaken)
+			throw new ConflictException("Email is already registered.");
+
+		var user = new User
+		{
+			Email = request.Email.Trim().ToLowerInvariant(),
+			PasswordHash = _passwordHasher.Hash(request.Password),
+			FullName = request.FullName.Trim(),
+			Role = UserRole.Freelancer,  // hardcoded — never from request
+			CreatedAt = DateTime.UtcNow
+		};
+
+		_db.Users.Add(user);
+		await _db.SaveChangesAsync();
+		return await IssueTokensAsync(user);
+	}
+
+	public async Task<AuthResponse> RegisterCompanyAsync(RegisterCompanyRequest request)
+	{
+		var emailTaken = await _db.Users
+			.AnyAsync(u => u.Email == request.Email.ToLowerInvariant());
+		if (emailTaken)
+			throw new ConflictException("Email is already registered.");
+
+		var user = new User
+		{
+			Email = request.Email.Trim().ToLowerInvariant(),
+			PasswordHash = _passwordHasher.Hash(request.Password),
+			FullName = request.FullName.Trim(),
+			Role = UserRole.Company,     // hardcoded — never from request
+			CreatedAt = DateTime.UtcNow,
+			Company = new Company
+			{
+				Name = request.CompanyName.Trim(),
+				IsApproved = false,      // must wait for admin approval
+				CreatedAt = DateTime.UtcNow
+			}
+		};
+
+		_db.Users.Add(user);
+		await _db.SaveChangesAsync();
 		return await IssueTokensAsync(user);
 	}
 

@@ -21,6 +21,22 @@ public class AuthController : ControllerBase
 		return Ok(result);
 	}
 
+	[HttpPost("register/freelancer")]
+	public async Task<ActionResult<AuthResponse>> RegisterFreelancer(
+	RegisterFreelancerRequest request)
+	{
+		var result = await _authService.RegisterFreelancerAsync(request);
+		return Ok(result);
+	}
+
+	[HttpPost("register/company")]
+	public async Task<ActionResult<AuthResponse>> RegisterCompany(
+		RegisterCompanyRequest request)
+	{
+		var result = await _authService.RegisterCompanyAsync(request);
+		return Ok(result);
+	}
+
 	[HttpPost("login")]
 	[EnableRateLimiting("auth")]
 	public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)

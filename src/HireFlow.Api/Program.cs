@@ -1,7 +1,9 @@
 using HireFlow.Api.Extensions;
 using HireFlow.Application;
+using HireFlow.Application.Interfaces;
+using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Extensions;
-using HireFlow.Infrastructure.Security;
+using HireFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
@@ -13,7 +15,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// JWT Authentication
 var secret = builder.Configuration["Jwt:Secret"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 	.AddJwtBearer(options =>
@@ -53,7 +54,6 @@ builder.Services.AddSwaggerGen(options =>
 {
 	options.SwaggerDoc("v1", new OpenApiInfo { Title = "HireFlow API", Version = "v1" });
 
-	// Adds the "Authorize" button to Swagger UI
 	options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
 	{
 		Name = "Authorization",
@@ -103,5 +103,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+	var db = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
+	var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+
+	await AdminSeeder.SeedAdminUserAsync(db, passwordHasher);
+}
 
 app.Run();

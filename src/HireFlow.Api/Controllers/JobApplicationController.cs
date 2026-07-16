@@ -1,83 +1,73 @@
 ﻿using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.DTOs.JobApplication;
-using HireFlow.Application.Interfaces;
-using HireFlow.Domain.Entities;
-using HireFlow.Domain.Exceptions;
+using HireFlow.Application.Features.JobApplication.Commands.ChangeApplicationStatus;
+using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationById;
+using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationByJob;
+using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationsByUser;
+using HireFlow.Domain.Enums;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace HireFlow.Api.Controllers;
 
 [ApiController]
-[Route("api")]
+[Route("api/applications")]
 [Authorize]
 public class JobApplicationsController : ControllerBase
 {
-	private readonly IJobApplicationService _applicationService;
+	private readonly IMediator _mediator;
 
-	public JobApplicationsController(IJobApplicationService applicationService)
-		=> _applicationService = applicationService;
-
-	[HttpPost("jobs/{jobId}/apply")]
-	[Authorize(Roles = "Freelancer")]
-	public async Task<ActionResult<JobApplicationDto>> Apply(
-		long jobId, SubmitApplicationRequest request)
+	public JobApplicationsController(IMediator mediator)
 	{
-		var userId = GetUserId();
-		var result = await _applicationService.SubmitAsync(jobId, userId, request);
+		_mediator = mediator;
+	}
+
+	[HttpPost("jobs/{jobId}")]
+	[Authorize(Roles = "Freelancer")]
+	public async Task<ActionResult<JobApplicationDto>> Submit(long jobId, SubmitApplicationRequest request)
+	{
+		var result = await _mediator.Send(new SubmitApplicationCommand(jobId, request));
 		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
 	}
 
-	[HttpGet("applications/my")]
-	[Authorize(Roles = "Freelancer")]
-	public async Task<ActionResult<PagedResult<JobApplicationDto>>> GetMine(
-		[FromQuery] int pageNumber = 1,
-		[FromQuery] int pageSize = 10)
+	[HttpPatch("{id}/status")]
+	[Authorize(Roles = "Company")]
+	public async Task<ActionResult<JobApplicationDto>> ChangeStatus(long id, [FromQuery] ApplicationStatus newStatus)
 	{
-		var userId = GetUserId();
-		var result = await _applicationService.GetByUserAsync(userId, pageNumber, pageSize);
+		var result = await _mediator.Send(new ChangeApplicationStatusCommand(id, newStatus));
 		return Ok(result);
 	}
 
-	[HttpGet("jobs/{jobId}/applications")]
+	[HttpGet("jobs/{jobId}")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<PagedResult<JobApplicationDto>>> GetByJob(
 		long jobId,
 		[FromQuery] int pageNumber = 1,
 		[FromQuery] int pageSize = 10)
 	{
-		var companyId = GetCompanyId();
-		var result = await _applicationService.GetByJobAsync(jobId, companyId, pageNumber, pageSize);
+		var result = await _mediator.Send(new GetJobApplicationsByJobQuery(jobId, pageNumber, pageSize));
 		return Ok(result);
 	}
 
-	[HttpGet("applications/{id}")]
+	[HttpGet("my")]
+	[Authorize(Roles = "Freelancer")]
+	public async Task<ActionResult<PagedResult<JobApplicationDto>>> GetByUser(
+		[FromQuery] int pageNumber = 1,
+		[FromQuery] int pageSize = 10)
+	{
+		var result = await _mediator.Send(new GetJobApplicationsByUserQuery(pageNumber, pageSize));
+		return Ok(result);
+	}
+
+	[HttpGet("{id}")]
+	[Authorize]
 	public async Task<ActionResult<JobApplicationDto>> GetById(long id)
 	{
-		var result = await _applicationService.GetByIdAsync(id);
-		if (result is null) return NotFound(new { message = $"Application with id '{id}' was not found." });
+		var result = await _mediator.Send(new GetJobApplicationByIdQuery(id));
+		if (result is null)
+			return NotFound();
+
 		return Ok(result);
-	}
-
-	[HttpPatch("applications/{id}/status")]
-	[Authorize(Roles = "Company")]
-	public async Task<ActionResult<JobApplicationDto>> ChangeStatus(
-		long id, ChangeStatusRequest request)
-	{
-		var companyId = GetCompanyId();
-		var result = await _applicationService.ChangeStatusAsync(id, companyId, request.NewStatus);
-		return Ok(result);
-	}
-
-	private long GetUserId()
-		=> long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-
-	private long GetCompanyId()
-	{
-		var claim = User.FindFirst("CompanyId")?.Value;
-		if (!long.TryParse(claim, out var id))
-			throw new ForbiddenException("Company profile not found in token.");
-		return id;
 	}
 }

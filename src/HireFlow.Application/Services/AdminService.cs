@@ -1,5 +1,5 @@
-﻿using HireFlow.Application.DTOs.Admin;
-using HireFlow.Application.DTOs.Common;
+﻿using HireFlow.Application.DTOs.Common;
+using HireFlow.Application.Features.Admin.Dtos;
 using HireFlow.Application.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
@@ -19,7 +19,7 @@ public class AdminService : IAdminService
 	public async Task<PagedResult<UserSummaryDto>> GetAllUsersAsync(int pageNumber, int pageSize)
 	{
 		var total = await _db.Users.CountAsync();
-
+		      
 		var items = await _db.Users
 			.OrderByDescending(u => u.CreatedAt)
 			.Skip((pageNumber - 1) * pageSize)

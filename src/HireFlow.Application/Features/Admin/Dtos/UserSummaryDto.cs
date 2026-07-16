@@ -1,4 +1,4 @@
-﻿namespace HireFlow.Application.DTOs.Admin;
+﻿namespace HireFlow.Application.Features.Admin.Dtos;
 
 public class UserSummaryDto
 {

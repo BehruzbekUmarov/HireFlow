@@ -1,6 +1,10 @@
-﻿using HireFlow.Application.DTOs.Admin;
-using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.Interfaces;
+﻿using HireFlow.Application.DTOs.Common;
+using HireFlow.Application.Features.Admin.Commands.ApproveCompany;
+using HireFlow.Application.Features.Admin.Commands.SuspendCompany;
+using HireFlow.Application.Features.Admin.Dtos;
+using HireFlow.Application.Features.Admin.Queries.GetCompany;
+using HireFlow.Application.Features.Admin.Queries.GetUsers;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,54 +15,44 @@ namespace HireFlow.Api.Controllers;
 [Authorize(Roles = "Admin")] 
 public class AdminController : ControllerBase
 {
-	private readonly IAdminService _adminService;
+	private readonly IMediator _mediator;
 
-	public AdminController(IAdminService adminService)
-		=> _adminService = adminService;
+	public AdminController(IMediator mediator)
+	{
+		_mediator = mediator;
+	}
 
 	[HttpGet("users")]
-	public async Task<ActionResult<PagedResult<UserSummaryDto>>> GetUsers(
+	public async Task<ActionResult<PagedResult<UserSummaryDto>>> GetAllUsers(
 		[FromQuery] int pageNumber = 1,
-		[FromQuery] int pageSize = 20)
+		[FromQuery] int pageSize = 10)
 	{
-		var result = await _adminService.GetAllUsersAsync(pageNumber, pageSize);
+		var query = new GetUsersQuery(pageNumber, pageSize);
+		var result = await _mediator.Send(query);
 		return Ok(result);
 	}
 
 	[HttpGet("companies")]
-	public async Task<ActionResult<PagedResult<CompanySummaryDto>>> GetCompanies(
+	public async Task<ActionResult<PagedResult<CompanySummaryDto>>> GetAllCompanies(
 		[FromQuery] int pageNumber = 1,
-		[FromQuery] int pageSize = 20)
+		[FromQuery] int pageSize = 10)
 	{
-		var result = await _adminService.GetAllCompaniesAsync(pageNumber, pageSize);
+		var query = new GetCompaniesQuery(pageNumber, pageSize);
+		var result = await _mediator.Send(query);
 		return Ok(result);
 	}
 
-	[HttpPatch("companies/{id}/approve")]
-	public async Task<IActionResult> ApproveCompany(long id)
+	[HttpPost("{id}/approve")]
+	public async Task<IActionResult> Approve(long id)
 	{
-		try
-		{
-			await _adminService.ApproveCompanyAsync(id);
-			return NoContent();
-		}
-		catch (InvalidOperationException ex)
-		{
-			return NotFound(new { message = ex.Message });
-		}
+		await _mediator.Send(new ApproveCompanyCommand(id));
+		return NoContent(); 
 	}
 
-	[HttpPatch("companies/{id}/suspend")]
-	public async Task<IActionResult> SuspendCompany(long id)
+	[HttpPost("{id}/suspend")]
+	public async Task<IActionResult> Suspend(long id)
 	{
-		try
-		{
-			await _adminService.SuspendCompanyAsync(id);
-			return NoContent();
-		}
-		catch (InvalidOperationException ex)
-		{
-			return NotFound(new { message = ex.Message });
-		}
+		await _mediator.Send(new SuspendCompanyCommand(id));
+		return NoContent();
 	}
 }

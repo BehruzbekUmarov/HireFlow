@@ -1,5 +1,5 @@
-﻿using HireFlow.Application.DTOs.Admin;
-using HireFlow.Application.DTOs.Common;
+﻿using HireFlow.Application.DTOs.Common;
+using HireFlow.Application.Features.Admin.Dtos;
 
 namespace HireFlow.Application.Interfaces;
 

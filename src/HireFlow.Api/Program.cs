@@ -1,6 +1,6 @@
 using HireFlow.Api.Extensions;
 using HireFlow.Application;
-using HireFlow.Application.Interfaces;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Extensions;
 using HireFlow.Infrastructure.Persistence;
@@ -12,8 +12,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services
+	.AddApplication()
+	.AddInfrastructure(builder.Configuration)
+	.RegisterApi(builder.Configuration);
 
 var secret = builder.Configuration["Jwt:Secret"]!;
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

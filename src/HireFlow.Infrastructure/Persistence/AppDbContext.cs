@@ -1,5 +1,4 @@
-﻿using HireFlow.Application.Interfaces;
-using HireFlow.Domain.Entities;
+﻿using HireFlow.Domain.Entities;
 using HireFlow.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

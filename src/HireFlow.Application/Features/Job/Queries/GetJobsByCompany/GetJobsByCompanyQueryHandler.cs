@@ -17,7 +17,11 @@ public sealed class GetJobsByCompanyQueryHandler : IRequestHandler<GetJobsByComp
 
 	public async Task<PagedResult<JobSummaryDto>> Handle(GetJobsByCompanyQuery request, CancellationToken cancellationToken)
 	{
-		var total = await _db.Jobs.CountAsync(j => j.CompanyId == request.CompanyId, cancellationToken);
+		var query = _db.Jobs
+		.AsNoTracking()
+		.Where(j => j.CompanyId == request.CompanyId);
+
+		var total = await query.CountAsync(cancellationToken);
 
 		var items = await _db.Jobs
 			.AsNoTracking()

@@ -16,7 +16,9 @@ public sealed class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, PagedR
 	}
 	public async Task<PagedResult<UserSummaryDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
 	{
-		var total = await _db.Users.CountAsync(cancellationToken);
+		var query = _db.Users.AsNoTracking();
+
+		var total = await query.CountAsync(cancellationToken);
 
 		var items = await _db.Users
 			.AsNoTracking()

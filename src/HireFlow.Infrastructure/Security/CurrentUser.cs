@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.Interfaces;
+﻿using HireFlow.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

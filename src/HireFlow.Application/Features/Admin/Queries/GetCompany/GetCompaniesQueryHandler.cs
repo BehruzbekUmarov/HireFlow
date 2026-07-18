@@ -16,7 +16,9 @@ public sealed class GetCompaniesQueryHandler : IRequestHandler<GetCompaniesQuery
 	}
 	public async Task<PagedResult<CompanySummaryDto>> Handle(GetCompaniesQuery request, CancellationToken cancellationToken)
 	{
-		var total = await _db.Companies.CountAsync(cancellationToken);
+		var query = _db.Companies.AsNoTracking();
+
+		var total = await query.CountAsync(cancellationToken);
 
 		var items = await _db.Companies
 			.AsNoTracking() 

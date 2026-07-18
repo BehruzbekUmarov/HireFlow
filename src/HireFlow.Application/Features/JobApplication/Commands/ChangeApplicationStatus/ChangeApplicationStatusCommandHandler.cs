@@ -1,6 +1,6 @@
 ﻿using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.JobApplication;
-using HireFlow.Application.Interfaces;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
 using HireFlow.Domain.Enums;
 using HireFlow.Domain.Exceptions;

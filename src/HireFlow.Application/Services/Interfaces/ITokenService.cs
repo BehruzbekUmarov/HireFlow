@@ -1,6 +1,6 @@
 ﻿using HireFlow.Domain.Entities;
 
-namespace HireFlow.Application.Interfaces;
+namespace HireFlow.Application.Services.Interfaces;
 
 public interface ITokenService
 {

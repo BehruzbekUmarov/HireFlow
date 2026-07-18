@@ -2,7 +2,6 @@
 using HireFlow.Application.DTOs.Auth.Responses;
 using HireFlow.Application.Features.Common.Commands.Login;
 using HireFlow.Application.Features.Common.Commands.RefreshToken;
-using HireFlow.Application.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

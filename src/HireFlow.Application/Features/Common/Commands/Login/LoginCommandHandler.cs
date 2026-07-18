@@ -1,5 +1,5 @@
 ﻿using HireFlow.Application.DTOs.Auth.Responses;
-using HireFlow.Application.Interfaces;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
 using HireFlow.Domain.Interfaces;
 using MediatR;

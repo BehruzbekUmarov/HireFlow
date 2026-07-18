@@ -1,7 +1,7 @@
 ﻿using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.DTOs.JobApplication;
-using HireFlow.Application.Interfaces;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using MediatR;
@@ -22,15 +22,20 @@ public class GetJobApplicationsByJobQueryHandler : IRequestHandler<GetJobApplica
 
 	public async Task<PagedResult<JobApplicationDto>> Handle(GetJobApplicationsByJobQuery request, CancellationToken cancellationToken)
 	{
-		var job = await _db.Jobs.FindAsync(new object[] { request.JobId }, cancellationToken)
-			?? throw new NotFoundException("Job", request.JobId);
+		var companyId = _currentUser.CompanyId
+			?? throw new ForbiddenException("You must be logged in as a company to view job applications.");
 
-		var companyId = _currentUser.CompanyId;
+		var job = await _db.Jobs.FindAsync(request.JobId, cancellationToken)
+			?? throw new NotFoundException("Job", request.JobId);
 
 		if (job.CompanyId != companyId)
 			throw new ForbiddenException("You can only view applications for your own job listings.");
 
-		var total = await _db.JobApplications.CountAsync(a => a.JobId == request.JobId, cancellationToken);
+		var query = _db.JobApplications
+			.AsNoTracking()
+			.Where(a => a.JobId == request.JobId);
+
+		var total = await query.CountAsync(cancellationToken);
 
 		var items = await _db.JobApplications
 			.AsNoTracking()

@@ -1,7 +1,8 @@
 ﻿using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.DTOs.JobApplication;
-using HireFlow.Application.Interfaces;
+using HireFlow.Application.Services.Interfaces;
+using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,11 +24,16 @@ public class GetJobApplicationsByUserQueryHandler : IRequestHandler<GetJobApplic
 	{
 		var userId = _currentUser.UserId;
 
-		var total = await _db.JobApplications.CountAsync(a => a.UserId == userId, cancellationToken);
+		if (userId is 0)
+			throw new ForbiddenException("You must be logged in to view your job applications.");
 
-		var items = await _db.JobApplications
+		var query = _db.JobApplications
 			.AsNoTracking()
-			.Where(a => a.UserId == userId)
+			.Where(a => a.UserId == userId);
+
+		var total = await query.CountAsync(cancellationToken);
+
+		var items = await query
 			.OrderByDescending(a => a.CreatedAt)
 			.Skip((request.PageNumber - 1) * request.PageSize)
 			.Take(request.PageSize)

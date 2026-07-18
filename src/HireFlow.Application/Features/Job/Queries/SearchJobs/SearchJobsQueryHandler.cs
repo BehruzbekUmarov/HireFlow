@@ -41,6 +41,8 @@ public class SearchJobsQueryHandler : IRequestHandler<SearchJobsQuery, PagedResu
 		if (filter.MaxSalary.HasValue)
 			dbQuery = dbQuery.Where(j => j.Salary <= filter.MaxSalary);
 
+		var total = await dbQuery.CountAsync(cancellationToken);
+
 		dbQuery = filter.SortBy switch
 		{
 			"Salary" => filter.SortOrder == "asc"
@@ -52,7 +54,6 @@ public class SearchJobsQueryHandler : IRequestHandler<SearchJobsQuery, PagedResu
 			_ => dbQuery.OrderByDescending(j => j.CreatedAt)
 		};
 
-		var total = await dbQuery.CountAsync(cancellationToken);
 		var items = await dbQuery
 			.Skip((filter.PageNumber - 1) * filter.PageSize)
 			.Take(filter.PageSize)

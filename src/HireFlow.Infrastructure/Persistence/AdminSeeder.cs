@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.Interfaces;
+﻿using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
 using HireFlow.Domain.Enums;
 using HireFlow.Domain.Interfaces;

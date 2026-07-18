@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.Interfaces;
+﻿using HireFlow.Application.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace HireFlow.Infrastructure.Security;

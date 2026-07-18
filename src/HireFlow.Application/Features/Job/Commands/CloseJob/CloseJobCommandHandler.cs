@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.Interfaces;
+﻿using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using MediatR;

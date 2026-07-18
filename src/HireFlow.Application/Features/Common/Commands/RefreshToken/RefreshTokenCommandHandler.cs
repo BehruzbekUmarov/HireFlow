@@ -1,10 +1,10 @@
 ﻿using HireFlow.Application.DTOs.Auth.Responses;
-using HireFlow.Application.Interfaces;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using HireFlow.Domain.Entities;
+using HireFlow.Application.Services.Interfaces;
 
 namespace HireFlow.Application.Features.Common.Commands.RefreshToken;
 

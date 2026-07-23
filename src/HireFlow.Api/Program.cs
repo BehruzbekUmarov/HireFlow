@@ -17,25 +17,6 @@ builder.Services
 	.AddInfrastructure(builder.Configuration)
 	.RegisterApi(builder.Configuration);
 
-var secret = builder.Configuration["Jwt:Secret"]!;
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-	.AddJwtBearer(options =>
-	{
-		options.TokenValidationParameters = new TokenValidationParameters
-		{
-			ValidateIssuer = true,
-			ValidateAudience = true,
-			ValidateLifetime = true,
-			ValidateIssuerSigningKey = true,
-			ValidIssuer = builder.Configuration["Jwt:Issuer"],
-			ValidAudience = builder.Configuration["Jwt:Audience"],
-			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
-			ClockSkew = TimeSpan.Zero
-		};
-	});
-
-builder.Services.AddAuthorization();
-
 builder.Services.AddRateLimiter(options =>
 	options.AddFixedWindowLimiter("auth", opt =>
 	{
@@ -103,7 +84,6 @@ app.UseCors("AllowAngular");
 app.UseRateLimiter();
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();

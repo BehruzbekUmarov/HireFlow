@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <Folder Include="Common\Constants\" />
-    <Folder Include="DTOs\Admin\" />
     <Folder Include="Features\Admin\Factories\" />
     <Folder Include="Features\Admin\Services\Implementations\" />
     <Folder Include="Features\Admin\Services\Interfaces\" />

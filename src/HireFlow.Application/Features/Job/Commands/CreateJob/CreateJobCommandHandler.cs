@@ -7,7 +7,7 @@ using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HireFlow.Application.Features.Job.CreateJob;
+namespace HireFlow.Application.Features.Job.Commands.CreateJob;
 
 public sealed class CreateJobCommandHandler : IRequestHandler<CreateJobCommand, JobDetailDto>
 {

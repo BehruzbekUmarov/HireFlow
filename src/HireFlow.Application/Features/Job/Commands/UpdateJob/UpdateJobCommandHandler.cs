@@ -6,7 +6,7 @@ using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HireFlow.Application.Features.Job.UpdateJob;
+namespace HireFlow.Application.Features.Job.Commands.UpdateJob;
 
 public class UpdateJobCommandHandler : IRequestHandler<UpdateJobCommand, JobDetailDto>
 {

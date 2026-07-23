@@ -1,11 +1,11 @@
 ﻿using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.DTOs.Job;
 using HireFlow.Application.Features.Job.Commands.CloseJob;
-using HireFlow.Application.Features.Job.CreateJob;
+using HireFlow.Application.Features.Job.Commands.CreateJob;
+using HireFlow.Application.Features.Job.Commands.UpdateJob;
 using HireFlow.Application.Features.Job.Queries.GetJobById;
 using HireFlow.Application.Features.Job.Queries.GetJobsByCompany;
 using HireFlow.Application.Features.Job.Queries.SearchJobs;
-using HireFlow.Application.Features.Job.UpdateJob;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +28,7 @@ public class JobsController : ControllerBase
 	public async Task<ActionResult<JobDetailDto>> Create([FromBody] CreateJobRequest request)
 	{
 		var result = await _mediator.Send(new CreateJobCommand(request));
-		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+		return Ok(result);
 	}
 
 	[HttpPut("{id}")]
@@ -39,7 +39,7 @@ public class JobsController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpPatch("{id}/close")]
+	[HttpPost("{id}/close")]
 	[Authorize(Roles = "Company")]
 	public async Task<IActionResult> Close(long id)
 	{

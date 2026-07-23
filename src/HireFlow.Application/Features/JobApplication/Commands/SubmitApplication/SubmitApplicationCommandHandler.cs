@@ -21,18 +21,22 @@ public sealed class SubmitApplicationCommandHandler : IRequestHandler<SubmitAppl
 
 	public async Task<JobApplicationDto> Handle(SubmitApplicationCommand command, CancellationToken cancellationToken)
 	{
-		var job = await _db.Jobs.FindAsync(new object[] { command.JobId }, cancellationToken)
-			?? throw new NotFoundException("job", command.JobId);
+		var job = await _db.Jobs
+			.AsNoTracking()
+			.FirstOrDefaultAsync(j => j.Id == command.JobId, cancellationToken);
+
+		if (job is null)
+			throw new NotFoundException("job", command.JobId);
 
 		if (!job.IsActive)
 			throw new InvalidOperationDomainException("This job is no longer accepting applications.");
 
 		var userId = _currentUser.UserId;
 
-		var alreadyApplied = await _db.JobApplications
-			.FirstOrDefaultAsync(a => a.JobId == command.JobId && a.UserId == userId, cancellationToken);
+		var hasAlreadyApplied = await _db.JobApplications
+			.AnyAsync(a => a.JobId == command.JobId && a.UserId == userId, cancellationToken);
 
-		if (alreadyApplied is not null)
+		if (hasAlreadyApplied)
 			throw new ConflictException("You have already applied to this job.");
 
 		var application = new JobApplication

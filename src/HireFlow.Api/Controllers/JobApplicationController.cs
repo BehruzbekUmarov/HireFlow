@@ -28,10 +28,10 @@ public class JobApplicationsController : ControllerBase
 	public async Task<ActionResult<JobApplicationDto>> Submit(long jobId, SubmitApplicationRequest request)
 	{
 		var result = await _mediator.Send(new SubmitApplicationCommand(jobId, request));
-		return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+		return Ok(result);
 	}
 
-	[HttpPatch("{id}/status")]
+	[HttpPost("{id}/status")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<JobApplicationDto>> ChangeStatus(long id, [FromQuery] ApplicationStatus newStatus)
 	{

@@ -7,13 +7,13 @@ public sealed class JwtOptions
 	public const string SectionName = nameof(JwtOptions);
 
 	[Required]
-	public required string Issuer { get; init; }
+	public string Issuer { get; init; }
 
 	[Required]
-	public required string Audience { get; init; }
+	public string Audience { get; init; }
 
 	[MinLength(32)]
-	public required string SecretKey { get; init; } = default!;
+	public string SecretKey { get; init; } = default!;
 
 	[Range(15, 120, ErrorMessage =
 		"Access token expiration must be between 15 and 120 minutes")]

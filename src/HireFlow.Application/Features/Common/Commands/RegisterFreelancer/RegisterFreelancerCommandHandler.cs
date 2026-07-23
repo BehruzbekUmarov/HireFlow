@@ -25,7 +25,7 @@ public class RegisterFreelancerCommandHandler : IRequestHandler<RegisterFreelanc
 		var request = command.Request;
 
 		var emailTaken = await _db.Users
-			.FirstAsync(u => u.Email == request.Email.ToLowerInvariant(), cancellationToken);
+			.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant(), cancellationToken);
 
 		if (emailTaken is not null)
 			throw new ConflictException("Email is already registered.");

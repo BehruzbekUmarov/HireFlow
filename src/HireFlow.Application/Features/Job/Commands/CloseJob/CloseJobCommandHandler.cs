@@ -1,4 +1,5 @@
-﻿using HireFlow.Application.Services.Interfaces;
+﻿using HireFlow.Application.Common.Constants;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
 using MediatR;
@@ -10,11 +11,13 @@ public class CloseJobCommandHandler : IRequestHandler<CloseJobCommand>
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
+	private readonly ICacheService _cache;
 
-	public CloseJobCommandHandler(IAppDbContext db, ICurrentUser currentUser)
+	public CloseJobCommandHandler(IAppDbContext db, ICurrentUser currentUser, ICacheService cache)
 	{
 		_db = db;
 		_currentUser = currentUser;
+		_cache = cache;
 	}
 
 	public async Task Handle(CloseJobCommand command, CancellationToken cancellationToken)
@@ -31,5 +34,7 @@ public class CloseJobCommandHandler : IRequestHandler<CloseJobCommand>
 		job.UpdatedAt = DateTime.UtcNow;
 
 		await _db.SaveChangesAsync(cancellationToken);
+
+		await _cache.RemoveByPrefixAsync(CacheKeys.JobSearchPrefix);
 	}
 }

@@ -1,4 +1,5 @@
-﻿using HireFlow.Application.Common.Mappings;
+﻿using HireFlow.Application.Common.Constants;
+using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Job;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
@@ -12,11 +13,13 @@ public class UpdateJobCommandHandler : IRequestHandler<UpdateJobCommand, JobDeta
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
+	private readonly ICacheService _cache;
 
-	public UpdateJobCommandHandler(IAppDbContext db, ICurrentUser currentUser)
+	public UpdateJobCommandHandler(IAppDbContext db, ICurrentUser currentUser, ICacheService cache)
 	{
 		_db = db;
 		_currentUser = currentUser;
+		_cache = cache;
 	}
 
 	public async Task<JobDetailDto> Handle(UpdateJobCommand command, CancellationToken cancellationToken)
@@ -38,6 +41,8 @@ public class UpdateJobCommandHandler : IRequestHandler<UpdateJobCommand, JobDeta
 		job.UpdatedAt = DateTime.UtcNow;
 
 		await _db.SaveChangesAsync(cancellationToken);
+
+		await _cache.RemoveByPrefixAsync(CacheKeys.JobSearchPrefix);
 
 		return await _db.Jobs
 			.Where(j => j.Id == job.Id)

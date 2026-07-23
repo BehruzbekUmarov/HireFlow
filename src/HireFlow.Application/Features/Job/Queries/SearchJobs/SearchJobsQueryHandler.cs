@@ -1,5 +1,7 @@
-﻿using HireFlow.Application.DTOs.Common;
+﻿using HireFlow.Application.Common.Constants;
+using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.DTOs.Job;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -9,15 +11,33 @@ namespace HireFlow.Application.Features.Job.Queries.SearchJobs;
 public class SearchJobsQueryHandler : IRequestHandler<SearchJobsQuery, PagedResult<JobSummaryDto>>
 {
 	private readonly IAppDbContext _db;
+	private readonly ICacheService _cache;
+	private static readonly TimeSpan CacheExpiry = TimeSpan.FromMinutes(5);
 
-	public SearchJobsQueryHandler(IAppDbContext db)
+	public SearchJobsQueryHandler(IAppDbContext db, ICacheService cache)
 	{
 		_db = db;
+		_cache = cache;
 	}
 
 	public async Task<PagedResult<JobSummaryDto>> Handle(SearchJobsQuery query, CancellationToken cancellationToken)
 	{
 		var filter = query.Filter;
+
+		var cacheKey = CacheKeys.JobSearch(
+			filter.Keyword,
+			filter.Category,
+			filter.Location,
+			filter.MinSalary,
+			filter.MaxSalary,
+			filter.SortBy,
+			filter.SortOrder,
+			filter.PageNumber,
+			filter.PageSize);
+
+		var cached = await _cache.GetAsync<PagedResult<JobSummaryDto>>(cacheKey);
+		if (cached is not null)
+			return cached;
 
 		var dbQuery = _db.Jobs
 			.AsNoTracking()
@@ -71,12 +91,16 @@ public class SearchJobsQueryHandler : IRequestHandler<SearchJobsQuery, PagedResu
 			})
 			.ToListAsync(cancellationToken);
 
-		return new PagedResult<JobSummaryDto>
+		var result = new PagedResult<JobSummaryDto>
 		{
 			Items = items,
 			TotalCount = total,
 			PageNumber = filter.PageNumber,
 			PageSize = filter.PageSize
 		};
+
+		await _cache.SetAsync(cacheKey, result, CacheExpiry);
+
+		return result;
 	}
 }

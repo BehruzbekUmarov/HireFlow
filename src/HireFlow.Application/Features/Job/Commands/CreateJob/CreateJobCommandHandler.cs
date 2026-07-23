@@ -1,4 +1,5 @@
-﻿using HireFlow.Application.Common.Mappings;
+﻿using HireFlow.Application.Common.Constants;
+using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Job;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
@@ -13,11 +14,16 @@ public sealed class CreateJobCommandHandler : IRequestHandler<CreateJobCommand, 
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
+	private readonly ICacheService _cache;
 
-	public CreateJobCommandHandler(IAppDbContext db, ICurrentUser currentUser)
+	public CreateJobCommandHandler(
+		IAppDbContext db,
+		ICurrentUser currentUser,
+		ICacheService cache)
 	{
 		_db = db;
 		_currentUser = currentUser;
+		_cache = cache;
 	}
 
 	public async Task<JobDetailDto> Handle(CreateJobCommand command, CancellationToken cancellationToken)
@@ -45,6 +51,8 @@ public sealed class CreateJobCommandHandler : IRequestHandler<CreateJobCommand, 
 
 		_db.Jobs.Add(job);
 		await _db.SaveChangesAsync(cancellationToken);
+
+		await _cache.RemoveByPrefixAsync(CacheKeys.JobSearchPrefix);
 
 		return await _db.Jobs
 			.Where(j => j.Id == job.Id)

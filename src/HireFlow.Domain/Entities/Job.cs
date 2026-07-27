@@ -10,10 +10,13 @@ public class Job
 	public string Category { get; set; }
 	public string Location { get; set; } 
 	public decimal Salary { get; set; }
-	public bool IsActive { get; set; } 
+	public bool IsActive { get; set; }
+	public bool IsDeleted { get; set; }      
+	public DateTime? ExpiresAt { get; set; }
 
 	public DateTime CreatedAt { get; set; }
-	public DateTime? UpdatedAt { get; set; } 
+	public DateTime? UpdatedAt { get; set; }
+	public DateTime? DeletedAt { get; set; }
 
 	public Company? Company { get; set; } 
 	public List<JobApplication> JobApplications { get; set; }
@@ -26,6 +29,7 @@ public class Job
 		Location = string.Empty;
 		Salary = 0;
 		IsActive = true;
+		IsDeleted = false;
 		CreatedAt = DateTime.UtcNow;
 		JobApplications = [];
 	}

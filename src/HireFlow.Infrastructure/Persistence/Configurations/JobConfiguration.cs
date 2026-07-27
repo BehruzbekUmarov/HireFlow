@@ -52,5 +52,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 			   .WithOne(a => a.Job)
 			   .HasForeignKey(a => a.JobId)
 			   .OnDelete(DeleteBehavior.Cascade);
+
+		builder.HasQueryFilter(j => !j.IsDeleted);
 	}
 }

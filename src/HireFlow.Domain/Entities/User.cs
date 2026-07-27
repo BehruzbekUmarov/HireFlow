@@ -8,21 +8,29 @@ public class User
 
 	public string Email { get; set; } 
 	public string PasswordHash { get; set; } 
-	public string FullName { get; set; } 
+	public string FullName { get; set; }
+	public string? PhoneNumber { get; set; }        
+	public string? ProfilePictureUrl { get; set; }
 	public UserRole Role { get; set; }
-	public DateTime CreatedAt { get; set; } 
+	public bool IsDeleted { get; set; }
+	public DateTime CreatedAt { get; set; }
+	public DateTime? UpdatedAt { get; set; }       
+	public DateTime? DeletedAt { get; set; }
 
 	public Company? Company { get; set; }
 	public List<JobApplication> JobApplications { get; set; } 
-	public List<RefreshToken> RefreshTokens { get; set; } 
+	public List<RefreshToken> RefreshTokens { get; set; }
+	public List<PasswordResetToken> PasswordResetTokens { get; set; }
 
 	public User() 
 	{
 		Email = string.Empty;
 		PasswordHash = string.Empty;
 		FullName = string.Empty;
+		IsDeleted = false;
 		CreatedAt = DateTime.UtcNow;
 		JobApplications = [];
 		RefreshTokens = [];
+		PasswordResetTokens = [];
 	} 
 }

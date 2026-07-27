@@ -11,6 +11,7 @@ public interface IAppDbContext
 	DbSet<JobApplication> JobApplications { get; }
 	DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; }
 	DbSet<RefreshToken> RefreshTokens { get; }
+	DbSet<PasswordResetToken> PasswordResetTokens { get; }
 
 	int SaveChanges();
 

@@ -38,5 +38,7 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 			   .WithOne(j => j.Company)
 			   .HasForeignKey(j => j.CompanyId)
 			   .OnDelete(DeleteBehavior.Cascade);
+
+		builder.HasQueryFilter(c => !c.IsDeleted);
 	}
 }

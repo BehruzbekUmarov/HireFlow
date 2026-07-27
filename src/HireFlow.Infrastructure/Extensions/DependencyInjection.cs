@@ -23,9 +23,6 @@ public static class DependencyInjection
 		// ---------- Redis ----------
 		var redisConnection = configuration.GetConnectionString("Redis")!;
 
-		services.AddSingleton<IConnectionMultiplexer>(
-			ConnectionMultiplexer.Connect(redisConnection));
-
 		services.AddSingleton<IConnectionMultiplexer>(_ =>
 		{
 			var config = ConfigurationOptions.Parse(redisConnection);

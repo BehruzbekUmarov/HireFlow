@@ -1,10 +1,11 @@
 ﻿using HireFlow.Application.DTOs.Auth.Requests;
 using HireFlow.Application.DTOs.Auth.Responses;
+using HireFlow.Application.Features.Common.Commands.ForgetPassword;
 using HireFlow.Application.Features.Common.Commands.Login;
 using HireFlow.Application.Features.Common.Commands.RefreshToken;
+using HireFlow.Application.Features.Common.Commands.ResetPassword;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace HireFlow.Api.Controllers;
 
@@ -50,6 +51,22 @@ public class AuthController : ControllerBase
 		if (result is null)
 			return Unauthorized(new { Message = "Invalid or expired refresh token." });
 
+		return Ok(result);
+	}
+
+	[HttpPost("forgot-password")]
+	public async Task<ActionResult<ForgotPasswordResponse>> ForgotPassword(
+	ForgotPasswordRequest request)
+	{
+		var result = await _mediator.Send(new ForgotPasswordCommand(request));
+		return Ok(result);
+	}
+
+	[HttpPost("reset-password")]
+	public async Task<ActionResult<ResetPasswordResponse>> ResetPassword(
+		ResetPasswordRequest request)
+	{
+		var result = await _mediator.Send(new ResetPasswordCommand(request));
 		return Ok(result);
 	}
 }

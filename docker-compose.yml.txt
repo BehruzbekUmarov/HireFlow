@@ -1,0 +1,104 @@
+# ---------------------------------------------
+  # Your .NET API
+  # ---------------------------------------------
+  api:
+    build:
+      context: .           # look for Dockerfile in current folder
+      dockerfile: Dockerfile
+    container_name: hireflow-api
+    ports:
+      - "8080:8080"        # localhost:8080 > container:8080
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=HireFlowDb;Username=postgres;Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__Redis=redis:6379
+      - JwtOptions__SecretKey=${JWT_SECRET}
+      - JwtOptions__Issuer=HireFlow
+      - JwtOptions__Audience=HireFlow
+      - JwtOptions__AccessTokenMinutes=120
+      - JwtOptions__RefreshTokenDays=7
+      - RabbitMQ__Host=rabbitmq
+      - RabbitMQ__Username=guest
+      - RabbitMQ__Password=guest
+      - Email__Host=${EMAIL_HOST}
+      - Email__Port=587
+      - Email__User=${EMAIL_USER}
+      - Email__Password=${EMAIL_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy   # wait until postgres is actually ready
+      redis:
+        condition: service_healthy   # wait until redis is actually ready
+      rabbitmq:
+        condition: service_healthy   # wait until rabbitmq is actually ready
+    restart: unless-stopped          # restart automatically if it crashes
+
+  # ---------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------
+  postgres:
+    image: postgres:16
+    container_name: hireflow-postgres
+    environment:
+      POSTGRES_DB: hireflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"        # expose so you can connect via pgAdmin on your machine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # data survives restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------
+  # Redis Cache
+  # ---------------------------------------------
+  redis:
+    image: redis:7-alpine              # alpine = smaller image
+    container_name: hireflow-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data               # persist cache across restarts
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  # ---------------------------------------------
+  # RabbitMQ Message Broker
+  # ---------------------------------------------
+  rabbitmq:
+    image: rabbitmq:3-management       # includes the web dashboard UI
+    container_name: hireflow-rabbitmq
+    ports:
+      - "5672:5672"                    # AMQP protocol port (your API uses this)
+      - "15672:15672"                  # Management dashboard (browser)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+# ---------------------------------------------
+# Named volumes — data lives here on your machine
+# survives docker compose down
+# only deleted with: docker compose down -v
+# ---------------------------------------------
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:

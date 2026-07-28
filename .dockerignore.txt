@@ -1,0 +1,27 @@
+# Don't copy these into the Docker build context
+
+# Build output — will be rebuilt inside Docker
+**/bin/
+**/obj/
+
+# Git
+.git
+.gitignore
+
+# Environment files — never put secrets in the image
+.env
+.env.*
+
+# IDE files
+.vs/
+*.user
+.idea/
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+
+# README and docs
+README.md
+docs/

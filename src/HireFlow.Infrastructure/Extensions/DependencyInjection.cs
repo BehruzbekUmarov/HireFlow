@@ -1,8 +1,12 @@
-﻿using HireFlow.Application.Services.Interfaces;
+﻿using HireFlow.Application.RabitMQ;
+using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Caching;
+using HireFlow.Infrastructure.Email;
+using HireFlow.Infrastructure.Messaging;
 using HireFlow.Infrastructure.Persistence;
 using HireFlow.Infrastructure.Security;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +20,7 @@ public static class DependencyInjection
 		this IServiceCollection services, IConfiguration configuration)
 	{
 		services.AddDbContext<AppDbContext>(options =>
-			options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+			options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 		services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
@@ -35,6 +39,29 @@ public static class DependencyInjection
 		services.AddScoped<IPasswordHasher, PasswordHasher>();
 		services.AddScoped<ITokenService, TokenService>();
 		services.AddScoped<ICurrentUser, CurrentUser>();
+
+		// ---------- Email ----------
+		services.AddScoped<IEmailService, SmtpEmailService>();
+
+		// ---------- RabbitMQ via MassTransit ----------
+		services.AddMassTransit(x =>
+		{
+			x.AddConsumer<ApplicationStatusChangedConsumer>();
+			x.AddConsumer<PasswordResetRequestedConsumer>();
+
+			x.UsingRabbitMq((context, cfg) =>
+			{
+				cfg.Host(configuration["RabbitMQ:Host"], "/", h =>
+				{
+					h.Username(configuration["RabbitMQ:Username"]!);
+					h.Password(configuration["RabbitMQ:Password"]!);
+				});
+
+				cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+
+				cfg.ConfigureEndpoints(context);
+			});
+		});
 
 		return services;
 	}

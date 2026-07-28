@@ -7,6 +7,12 @@
 **/appsettings.Development.json
 **/appsettings.Production.json
 
+.env              < passwords — never push
+**/bin/
+**/obj/
+.vs/
+*.user
+
 # User-specific files
 *.rsuser
 *.suo

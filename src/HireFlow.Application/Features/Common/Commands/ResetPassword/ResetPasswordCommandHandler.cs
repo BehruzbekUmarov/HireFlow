@@ -30,7 +30,7 @@ public class ResetPasswordCommandHandler
 		if (command.Request.NewPassword != command.Request.ConfirmPassword)
 			throw new InvalidOperationDomainException("Passwords do not match.");
 
-		var tokenHash = _tokenService.HashToken(command.Request.Token);
+		var tokenHash = _tokenService.HashToken(command.Request.Code);
 
 		var resetToken = await _db.PasswordResetTokens
 			.Include(t => t.User)

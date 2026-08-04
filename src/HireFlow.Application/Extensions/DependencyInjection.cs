@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace HireFlow.Application;
+namespace HireFlow.Application.Extensions;
 
 public static class DependencyInjection
 {

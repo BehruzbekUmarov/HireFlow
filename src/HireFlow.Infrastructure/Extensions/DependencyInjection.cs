@@ -1,5 +1,4 @@
-﻿using HireFlow.Application.RabitMQ;
-using HireFlow.Application.Services.Interfaces;
+﻿using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Caching;
 using HireFlow.Infrastructure.Email;

@@ -8,8 +8,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Common.Commands.ForgetPassword;
-
-// ForgotPasswordCommandHandler.cs
 public class ForgotPasswordCommandHandler
 	: IRequestHandler<ForgotPasswordCommand, ForgotPasswordResponse>
 {
@@ -47,14 +45,16 @@ public class ForgotPasswordCommandHandler
 		foreach (var token in existing)
 			token.Used = true;
 
-		var rawToken = _tokenService.GenerateRefreshToken(); 
-		var tokenHash = _tokenService.HashToken(rawToken);
+		//var rawToken = _tokenService.GenerateRefreshToken(); 
+		var code = GenerateCode();
+
+		var tokenHash = _tokenService.HashToken(code);
 
 		_db.PasswordResetTokens.Add(new PasswordResetToken
 		{
 			UserId = user.Id,
 			TokenHash = tokenHash,
-			ExpiresAt = DateTime.UtcNow.AddHours(1), 
+			ExpiresAt = DateTime.UtcNow.AddMinutes(15), 
 			Used = false,
 			CreatedAt = DateTime.UtcNow
 		});
@@ -65,13 +65,18 @@ public class ForgotPasswordCommandHandler
 		{
 			ToEmail = user.Email,
 			FullName = user.FullName,
-			RawToken = rawToken,
-			ExpiresAt = DateTime.UtcNow.AddHours(1)
+			RawToken = code,
+			ExpiresAt = DateTime.UtcNow.AddMinutes(15)
 		}, cancellationToken);
 
 		return new ForgotPasswordResponse
 		{
 			Message = "If that email is registered, a reset link has been sent."
 		};
+	}
+
+	private static string GenerateCode()
+	{
+		return Random.Shared.Next(100000, 999999).ToString();
 	}
 }

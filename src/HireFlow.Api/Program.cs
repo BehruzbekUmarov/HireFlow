@@ -1,11 +1,12 @@
 using HireFlow.Api.Extensions;
-using HireFlow.Application;
+using HireFlow.Application.Extensions;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Extensions;
 using HireFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -90,6 +91,9 @@ app.MapControllers();
 
 using (var scope = app.Services.CreateScope())
 {
+	var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	await dbContext.Database.MigrateAsync();
+
 	var db = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
 	var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
 

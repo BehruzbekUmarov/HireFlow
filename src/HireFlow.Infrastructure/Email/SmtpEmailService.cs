@@ -107,26 +107,27 @@ public class SmtpEmailService : IEmailService
 	public async Task SendPasswordResetAsync(
 	string toEmail, string toName, string rawToken, DateTime expiresAt)
 	{
-		// In production this would be your real frontend URL
-		var resetUrl = $"https://hireflow.com/reset-password?token={rawToken}";
-
-		var subject = "Reset your HireFlow password";
+		var subject = "Your HireFlow password reset code";
 		var body = $"""
         <html>
         <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #3C3489;">Password Reset — HireFlow</h2>
             <p>Hi <strong>{toName}</strong>,</p>
-            <p>We received a request to reset your password.
-               Click the button below to set a new one:</p>
-            <p style="text-align: center; margin: 30px 0;">
-                <a href="{resetUrl}"
-                   style="background: #3C3489; color: white; padding: 12px 24px;
-                          text-decoration: none; border-radius: 6px; font-weight: bold;">
-                    Reset Password
-                </a>
+            <p>Use this code to reset your password:</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <span style="font-size: 42px; font-weight: bold; letter-spacing: 12px;
+                             color: #3C3489; background: #EEEDFE; padding: 16px 24px;
+                             border-radius: 12px; font-family: monospace;">
+                    {rawToken}
+                </span>
+            </div>
+            
+            <p style="color: #888; font-size: 13px; text-align: center;">
+                This code expires in <strong>15 minutes</strong>
+                ({expiresAt:HH:mm UTC}).
             </p>
             <p style="color: #888; font-size: 13px;">
-                This link expires at {expiresAt:HH:mm UTC, MMMM dd yyyy}.
                 If you didn't request this, you can safely ignore this email.
             </p>
             <p style="color: #888; font-size: 12px;">— The HireFlow Team</p>

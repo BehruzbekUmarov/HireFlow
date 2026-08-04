@@ -1,10 +1,9 @@
-﻿
-using HireFlow.Application.Events;
+﻿using HireFlow.Application.Events;
 using HireFlow.Application.Services.Interfaces;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
-namespace HireFlow.Application.RabitMQ;
+namespace HireFlow.Infrastructure.Messaging;
 
 public class PasswordResetRequestedConsumer : IConsumer<PasswordResetRequestedEvent>
 {

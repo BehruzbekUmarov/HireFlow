@@ -1,6 +1,6 @@
 # Don't copy these into the Docker build context
 
-# Build output — will be rebuilt inside Docker
+# Build output â€” will be rebuilt inside Docker
 **/bin/
 **/obj/
 
@@ -8,7 +8,7 @@
 .git
 .gitignore
 
-# Environment files — never put secrets in the image
+# Environment files â€” never put secrets in the image
 .env
 .env.*
 

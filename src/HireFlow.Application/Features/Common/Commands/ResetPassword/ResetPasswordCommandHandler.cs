@@ -34,16 +34,11 @@ public class ResetPasswordCommandHandler
 
 		var resetToken = await _db.PasswordResetTokens
 			.Include(t => t.User)
-			.FirstOrDefaultAsync(t => t.TokenHash == tokenHash, cancellationToken)
-			?? throw new NotFoundException("Reset token is invalid.");
+			.FirstOrDefaultAsync(t => t.TokenHash == tokenHash, cancellationToken);
 
-		if (resetToken.Used)
+		if (resetToken is null || resetToken.Used || resetToken.ExpiresAt < DateTime.UtcNow)
 			throw new InvalidOperationDomainException(
-				"This reset link has already been used.");
-
-		if (resetToken.ExpiresAt < DateTime.UtcNow)
-			throw new InvalidOperationDomainException(
-				"This reset link has expired. Please request a new one.");
+				"Reset code is invalid or has expired. Please request a new one.");
 
 		resetToken.User!.PasswordHash =
 			_passwordHasher.Hash(command.Request.NewPassword);

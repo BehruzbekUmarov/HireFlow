@@ -35,7 +35,7 @@ public class ForgotPasswordCommandHandler
 		if (user is null)
 			return new ForgotPasswordResponse
 			{
-				Message = "If that email is registered, a reset link has been sent."
+				Message = "If that email is registered, a reset code has been sent."
 			};
 
 		var existing = await _db.PasswordResetTokens
@@ -45,7 +45,6 @@ public class ForgotPasswordCommandHandler
 		foreach (var token in existing)
 			token.Used = true;
 
-		//var rawToken = _tokenService.GenerateRefreshToken(); 
 		var code = GenerateCode();
 
 		var tokenHash = _tokenService.HashToken(code);
@@ -71,7 +70,7 @@ public class ForgotPasswordCommandHandler
 
 		return new ForgotPasswordResponse
 		{
-			Message = "If that email is registered, a reset link has been sent."
+			Message = "If that email is registered, a reset code has been sent."
 		};
 	}
 

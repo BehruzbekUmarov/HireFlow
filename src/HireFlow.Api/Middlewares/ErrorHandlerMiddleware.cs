@@ -30,18 +30,37 @@ internal sealed class ErrorHandlerMiddleware
 
 	private async Task HandleAsync(Exception exception, HttpContext context)
 	{
-		_logger.LogError(exception, "Exception occurred: {Message}", exception.Message);
+		if (exception is DomainException
+			or FluentValidation.ValidationException) 
+					_logger.LogWarning("Domain exception [{Type}]: {Message}",
+						exception.GetType().Name, exception.Message);
+		else
+			_logger.LogError(exception,
+				"Unhandled exception: {Message}", exception.Message);
 
 		var details = GetErrorDetails(exception);
 
 		context.Response.StatusCode = details.Status!.Value;
-
+		context.Response.ContentType = "application/json";
 		await context.Response.WriteAsJsonAsync(details);
 	}
 
 	private static ProblemDetails GetErrorDetails(Exception exception)
 		=> exception switch
 		{
+			FluentValidation.ValidationException validationEx => new ProblemDetails
+			{
+				Status = StatusCodes.Status400BadRequest,
+				Title = "Validation failed",
+				Extensions =
+				{
+					["errors"] = validationEx.Errors
+						.GroupBy(e => e.PropertyName)
+						.ToDictionary(
+							g => g.Key,
+							g => g.Select(e => e.ErrorMessage).ToArray())
+				}
+			},
 			CompanyNotApprovedException => new ProblemDetails
 			{
 				Status = StatusCodes.Status403Forbidden,

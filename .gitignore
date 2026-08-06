@@ -11,6 +11,9 @@
 .env.txt
 *.env
 
+# Add to .gitignore
+logs/
+
 # User-specific files
 *.rsuser
 *.suo

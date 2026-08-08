@@ -31,12 +31,6 @@ try
 			opt.Window = TimeSpan.FromMinutes(1);
 		}));
 
-	builder.Services.AddCors(options =>
-		options.AddPolicy("AllowAngular",
-			policy => policy.WithOrigins("http://localhost:4200")
-							.AllowAnyHeader()
-							.AllowAnyMethod()));
-
 	builder.Services.AddControllers();
 	builder.Services.AddEndpointsApiExplorer();
 
@@ -79,14 +73,10 @@ try
 			"HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0}ms)";
 	});
 
-	if (app.Environment.IsDevelopment())
-	{
-		app.UseSwagger();
-		app.UseSwaggerUI();
-	}
+	app.UseSwagger();
+	app.UseSwaggerUI();
 
 	app.UseErrorHandler();
-	app.UseHttpsRedirection();
 	app.UseCors("AllowAngular");
 	app.UseRateLimiter();
 	app.UseAuthentication();

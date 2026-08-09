@@ -20,10 +20,8 @@ services:
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Username=${RABBITMQ_USERNAME}
       - RabbitMQ__Password=${RABBITMQ_PASSWORD}
-      - Email__Host=${EMAIL_HOST}
-      - Email__Port=587
-      - Email__User=${EMAIL_USER}
-      - Email__Password=${EMAIL_PASSWORD}
+      - Resend__ApiKey=${RESEND_API_KEY}
+      - Resend__From=onboarding@resend.dev
     depends_on:
       postgres:
         condition: service_healthy

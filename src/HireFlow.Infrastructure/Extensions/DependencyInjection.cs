@@ -40,7 +40,7 @@ public static class DependencyInjection
 		services.AddScoped<ICurrentUser, CurrentUser>();
 
 		// ---------- Email ----------
-		services.AddScoped<IEmailService, SmtpEmailService>();
+		services.AddHttpClient<IEmailService, ResendEmailService>();
 
 		// ---------- RabbitMQ via MassTransit ----------
 		services.AddMassTransit(x =>

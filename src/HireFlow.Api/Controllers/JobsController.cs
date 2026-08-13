@@ -2,6 +2,7 @@
 using HireFlow.Application.DTOs.Job;
 using HireFlow.Application.Features.Job.Commands.CloseJob;
 using HireFlow.Application.Features.Job.Commands.CreateJob;
+using HireFlow.Application.Features.Job.Commands.DeleteJob;
 using HireFlow.Application.Features.Job.Commands.UpdateJob;
 using HireFlow.Application.Features.Job.Queries.GetJobById;
 using HireFlow.Application.Features.Job.Queries.GetJobsByCompany;
@@ -72,5 +73,13 @@ public class JobsController : ControllerBase
 	{
 		var result = await _mediator.Send(new GetJobsByCompanyQuery(companyId, pageNumber, pageSize));
 		return Ok(result);
+	}
+
+	[HttpDelete("jobs/{id}")]
+	[Authorize(Roles = "Admin")]
+	public async Task<IActionResult> DeleteJob(long id)
+	{
+		await _mediator.Send(new AdminDeleteJobCommand(id));
+		return NoContent();
 	}
 }

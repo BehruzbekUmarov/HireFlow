@@ -1,9 +1,11 @@
 ﻿using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.Features.Admin.Commands.ApproveCompany;
+using HireFlow.Application.Features.Admin.Commands.DeleteUser;
 using HireFlow.Application.Features.Admin.Commands.SuspendCompany;
 using HireFlow.Application.Features.Admin.Dtos;
 using HireFlow.Application.Features.Admin.Queries.GetCompany;
 using HireFlow.Application.Features.Admin.Queries.GetUsers;
+using HireFlow.Application.Features.Job.Commands.DeleteJob;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,6 +55,14 @@ public class AdminController : ControllerBase
 	public async Task<IActionResult> Suspend(long id)
 	{
 		await _mediator.Send(new SuspendCompanyCommand(id));
+		return NoContent();
+	}
+
+	[HttpDelete("users/{id}")]
+	[Authorize(Roles = "Admin")]
+	public async Task<IActionResult> DeleteUser(long id)
+	{
+		await _mediator.Send(new AdminDeleteUserCommand(id));
 		return NoContent();
 	}
 }

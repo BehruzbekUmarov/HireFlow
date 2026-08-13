@@ -73,6 +73,17 @@ try
 			"HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0}ms)";
 	});
 
+	// Create uploads folder if it doesn't exist
+	var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
+	Directory.CreateDirectory(uploadsPath);
+
+	// Serve files from /uploads URL path
+	app.UseStaticFiles(new StaticFileOptions
+	{
+		FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+		RequestPath = "/uploads"
+	});
+
 	app.UseSwagger();
 	app.UseSwaggerUI();
 

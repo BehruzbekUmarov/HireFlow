@@ -5,6 +5,7 @@ using HireFlow.Infrastructure.Email;
 using HireFlow.Infrastructure.Messaging;
 using HireFlow.Infrastructure.Persistence;
 using HireFlow.Infrastructure.Security;
+using HireFlow.Infrastructure.Storage;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -38,6 +39,7 @@ public static class DependencyInjection
 		services.AddScoped<IPasswordHasher, PasswordHasher>();
 		services.AddScoped<ITokenService, TokenService>();
 		services.AddScoped<ICurrentUser, CurrentUser>();
+		services.AddScoped<IFileStorageService, LocalFileStorageService>();
 
 		// ---------- Email ----------
 		services.AddHttpClient<IEmailService, ResendEmailService>();

@@ -1,6 +1,7 @@
 ﻿using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.DTOs.JobApplication;
 using HireFlow.Application.Features.JobApplication.Commands.ChangeApplicationStatus;
+using HireFlow.Application.Features.JobApplication.Commands.WithdrawApplication;
 using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationById;
 using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationByJob;
 using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationsByUser;
@@ -69,5 +70,14 @@ public class JobApplicationsController : ControllerBase
 			return NotFound();
 
 		return Ok(result);
+	}
+
+	// PATCH api/applications/5/withdraw
+	[HttpPatch("{id}/withdraw")]
+	[Authorize(Roles = "Freelancer")]
+	public async Task<IActionResult> Withdraw(long id)
+	{
+		await _mediator.Send(new WithdrawApplicationCommand(id));
+		return NoContent();
 	}
 }

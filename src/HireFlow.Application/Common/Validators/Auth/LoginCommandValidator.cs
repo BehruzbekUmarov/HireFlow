@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using HireFlow.Application.Features.Common.Commands.Login;
+using HireFlow.Application.Features.Common.Auth.Commands.Login;
 
 namespace HireFlow.Application.Common.Validators.Auth;
 

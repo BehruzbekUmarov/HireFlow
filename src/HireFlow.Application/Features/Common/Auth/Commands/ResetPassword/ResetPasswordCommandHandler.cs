@@ -5,7 +5,7 @@ using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HireFlow.Application.Features.Common.Commands.ResetPassword;
+namespace HireFlow.Application.Features.Common.Auth.Commands.ResetPassword;
 
 public class ResetPasswordCommandHandler
 	: IRequestHandler<ResetPasswordCommand, ResetPasswordResponse>

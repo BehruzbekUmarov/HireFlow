@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using HireFlow.Application.Features.Common.Commands.ForgetPassword;
+using HireFlow.Application.Features.Common.Auth.Commands.ForgetPassword;
 
 namespace HireFlow.Application.Common.Validators.Auth;
 

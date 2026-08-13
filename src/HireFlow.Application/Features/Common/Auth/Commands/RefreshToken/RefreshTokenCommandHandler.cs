@@ -1,51 +1,50 @@
 ﻿using HireFlow.Application.DTOs.Auth.Responses;
-using HireFlow.Application.Services.Interfaces;
-using HireFlow.Domain.Entities;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using HireFlow.Domain.Entities;
+using HireFlow.Application.Services.Interfaces;
 
-namespace HireFlow.Application.Features.Common.Commands.Login;
+namespace HireFlow.Application.Features.Common.Auth.Commands.RefreshToken;
 
-public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse?>
+public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, RefreshResponse?>
 {
 	private readonly IAppDbContext _db;
-	private readonly IPasswordHasher _passwordHasher;
 	private readonly ITokenService _tokenService;
 	private readonly int _refreshTokenDays;
 	private readonly int _accessTokenMinutes;
 
-	public LoginCommandHandler(
+	public RefreshTokenCommandHandler(
 		IAppDbContext db,
-		IPasswordHasher passwordHasher,
 		ITokenService tokenService,
 		IConfiguration configuration)
 	{
 		_db = db;
-		_passwordHasher = passwordHasher;
 		_tokenService = tokenService;
 		_refreshTokenDays = configuration.GetValue<int>("Jwt:RefreshTokenDays", 7);
 		_accessTokenMinutes = configuration.GetValue<int>("Jwt:AccessTokenMinutes", 15);
 	}
 
-	public async Task<LoginResponse?> Handle(LoginCommand command, CancellationToken cancellationToken)
+	public async Task<RefreshResponse?> Handle(RefreshTokenCommand command, CancellationToken cancellationToken)
 	{
-		var request = command.Request;
+		var tokenHash = _tokenService.HashToken(command.RefreshToken);
 
-		var user = await _db.Users
-			.Include(u => u.Company)
-			.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant(), cancellationToken);
+		var stored = await _db.RefreshTokens
+			.Include(t => t.User).ThenInclude(u => u!.Company)
+			.FirstOrDefaultAsync(t => t.TokenHash == tokenHash, cancellationToken);
 
-		if (user is null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
+		if (stored is null || stored.Revoked || stored.ExpiresAt < DateTime.UtcNow)
 			return null;
 
-		var accessToken = _tokenService.GenerateAccessToken(user);
+		stored.Revoked = true;
+
+		var accessToken = _tokenService.GenerateAccessToken(stored.User!);
 		var rawRefreshToken = _tokenService.GenerateRefreshToken();
 
-		_db.RefreshTokens.Add(new HireFlow.Domain.Entities.RefreshToken
+		_db.RefreshTokens.Add(new Domain.Entities.RefreshToken
 		{
-			UserId = user.Id,
+			UserId = stored.User!.Id,
 			TokenHash = _tokenService.HashToken(rawRefreshToken),
 			ExpiresAt = DateTime.UtcNow.AddDays(_refreshTokenDays),
 			Revoked = false,
@@ -54,12 +53,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse?>
 
 		await _db.SaveChangesAsync(cancellationToken);
 
-		return new LoginResponse
+		return new RefreshResponse
 		{
-			Id = user.Id,
-			Email = user.Email,
-			FullName = user.FullName,
-			Role = user.Role.ToString(),
 			AccessToken = accessToken,
 			RefreshToken = rawRefreshToken,
 			AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(_accessTokenMinutes)

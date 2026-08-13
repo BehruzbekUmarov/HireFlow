@@ -9,6 +9,10 @@ public class User
 	public string Email { get; set; } 
 	public string PasswordHash { get; set; } 
 	public string FullName { get; set; }
+	public string?  Bio { get; set; }
+	public string?  Skills { get; set; }
+	public string?  PortfolioUrl { get; set; }
+	public int? YearsOfExperience { get; set; }
 	public string? PhoneNumber { get; set; }        
 	public string? ProfilePictureUrl { get; set; }
 	public UserRole Role { get; set; }

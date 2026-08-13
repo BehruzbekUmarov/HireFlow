@@ -1,9 +1,9 @@
 ﻿using HireFlow.Application.DTOs.Auth.Requests;
 using HireFlow.Application.DTOs.Auth.Responses;
-using HireFlow.Application.Features.Common.Commands.ForgetPassword;
-using HireFlow.Application.Features.Common.Commands.Login;
-using HireFlow.Application.Features.Common.Commands.RefreshToken;
-using HireFlow.Application.Features.Common.Commands.ResetPassword;
+using HireFlow.Application.Features.Common.Auth.Commands.ForgetPassword;
+using HireFlow.Application.Features.Common.Auth.Commands.Login;
+using HireFlow.Application.Features.Common.Auth.Commands.RefreshToken;
+using HireFlow.Application.Features.Common.Auth.Commands.ResetPassword;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

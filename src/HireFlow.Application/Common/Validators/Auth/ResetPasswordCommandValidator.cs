@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using HireFlow.Application.Features.Common.Commands.ResetPassword;
+using HireFlow.Application.Features.Common.Auth.Commands.ResetPassword;
 
 namespace HireFlow.Application.Common.Validators.Auth;
 

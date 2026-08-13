@@ -7,7 +7,7 @@ using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HireFlow.Application.Features.Common.Commands.RegisterCompany;
+namespace HireFlow.Application.Features.Common.Auth.Commands.RegisterCompany;
 
 public class RegisterCompanyCommandHandler : IRequestHandler<RegisterCompanyCommand, RegisterResponse>
 {
@@ -29,7 +29,7 @@ public class RegisterCompanyCommandHandler : IRequestHandler<RegisterCompanyComm
 		if (emailTaken is not null)
 			throw new ConflictException("Email is already registered.");
 
-		var user = new User
+		var user = new HireFlow.Domain.Entities.User
 		{
 			Email = request.Email.Trim().ToLowerInvariant(),
 			PasswordHash = _passwordHasher.Hash(request.Password),

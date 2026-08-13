@@ -1,6 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Features\Common\Dtos\**" />
+    <Compile Remove="Features\Common\Queries\**" />
+    <EmbeddedResource Remove="Features\Common\Dtos\**" />
+    <EmbeddedResource Remove="Features\Common\Queries\**" />
+    <None Remove="Features\Common\Dtos\**" />
+    <None Remove="Features\Common\Queries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\HireFlow.Domain\HireFlow.Domain.csproj" />
   </ItemGroup>
 
@@ -18,8 +27,6 @@
     <Folder Include="Features\Admin\Factories\" />
     <Folder Include="Features\Admin\Services\Implementations\" />
     <Folder Include="Features\Admin\Services\Interfaces\" />
-    <Folder Include="Features\Common\Dtos\" />
-    <Folder Include="Features\Common\Queries\" />
     <Folder Include="Services\Implementations\" />
   </ItemGroup>
 

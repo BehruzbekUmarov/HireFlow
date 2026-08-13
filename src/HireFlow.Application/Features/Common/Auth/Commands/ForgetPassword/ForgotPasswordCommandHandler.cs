@@ -7,7 +7,7 @@ using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace HireFlow.Application.Features.Common.Commands.ForgetPassword;
+namespace HireFlow.Application.Features.Common.Auth.Commands.ForgetPassword;
 public class ForgotPasswordCommandHandler
 	: IRequestHandler<ForgotPasswordCommand, ForgotPasswordResponse>
 {

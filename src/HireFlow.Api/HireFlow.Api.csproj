@@ -25,4 +25,9 @@
     <ProjectReference Include="..\HireFlow.Infrastructure\HireFlow.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="uploads\avatars\" />
+    <Folder Include="uploads\cvs\" />
+  </ItemGroup>
+
 </Project>

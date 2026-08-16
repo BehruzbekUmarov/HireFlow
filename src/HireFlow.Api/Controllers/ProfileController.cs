@@ -1,6 +1,9 @@
 ﻿using HireFlow.Api.Common.File;
 using HireFlow.Application.DTOs.User;
+using HireFlow.Application.Features.Common.User.Commands.UpdateCompanyLogo;
 using HireFlow.Application.Features.Common.User.Commands.UpdateCompanyProfile;
+using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerAvatar;
+using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerCv;
 using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerProfile;
 using HireFlow.Application.Features.Common.User.Queries.GetCompanyProfile;
 using HireFlow.Application.Features.Common.User.Queries.GetFreelancerProfile;
@@ -65,7 +68,24 @@ public class ProfileController : ControllerBase
 		return Ok(result);
 	}
 
-	// POST api/profile/freelancer/cv
+	[HttpPost("freelancer/avatar")]
+	[Authorize(Roles = "Freelancer")]
+	public async Task<ActionResult<string>> UploadAvatar(IFormFile file)
+	{
+		FileValidator.ValidateImage(file);
+
+		// Save file → get URL
+		var url = await _fileStorageService.SaveAsync(
+			file.OpenReadStream(),
+			file.FileName,
+			folder: "avatars");
+
+		// Set URL internally — user never sees or touches this
+		await _mediator.Send(new UpdateFreelancerAvatarCommand(url));
+
+		return Ok(new { url });
+	}
+
 	[HttpPost("freelancer/cv")]
 	[Authorize(Roles = "Freelancer")]
 	public async Task<ActionResult<string>> UploadCv(IFormFile file)
@@ -77,32 +97,11 @@ public class ProfileController : ControllerBase
 			file.FileName,
 			folder: "cvs");
 
-		// Save URL to user profile
-		await _mediator.Send(new UpdateFreelancerProfileCommand(
-			new UpdateFreelancerProfileRequest { CvUrl = url }));
+		await _mediator.Send(new UpdateFreelancerCvCommand(url)); // ← clean
 
 		return Ok(new { url });
 	}
 
-	// POST api/profile/freelancer/avatar
-	[HttpPost("freelancer/avatar")]
-	[Authorize(Roles = "Freelancer")]
-	public async Task<ActionResult<string>> UploadAvatar(IFormFile file)
-	{
-		FileValidator.ValidateImage(file);
-
-		var url = await _fileStorageService.SaveAsync(
-			file.OpenReadStream(),
-			file.FileName,
-			folder: "avatars");
-
-		await _mediator.Send(new UpdateFreelancerProfileCommand(
-			new UpdateFreelancerProfileRequest { ProfilePictureUrl = url }));
-
-		return Ok(new { url });
-	}
-
-	// POST api/profile/company/logo
 	[HttpPost("company/logo")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<string>> UploadLogo(IFormFile file)
@@ -114,8 +113,7 @@ public class ProfileController : ControllerBase
 			file.FileName,
 			folder: "logos");
 
-		await _mediator.Send(new UpdateCompanyProfileCommand(
-			new UpdateCompanyProfileRequest { LogoUrl = url }));
+		await _mediator.Send(new UpdateCompanyLogoCommand(url)); 
 
 		return Ok(new { url });
 	}

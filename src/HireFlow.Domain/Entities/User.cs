@@ -15,6 +15,7 @@ public class User
 	public int? YearsOfExperience { get; set; }
 	public string? PhoneNumber { get; set; }        
 	public string? ProfilePictureUrl { get; set; }
+	public string? CvUrl { get; set; }
 	public UserRole Role { get; set; }
 	public bool IsDeleted { get; set; }
 	public DateTime CreatedAt { get; set; }

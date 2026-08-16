@@ -35,7 +35,6 @@ public class UpdateFreelancerProfileCommandHandler
 		if (req.Skills is not null) user.Skills = req.Skills.Trim();
 		if (req.PhoneNumber is not null) user.PhoneNumber = req.PhoneNumber.Trim();
 		if (req.PortfolioUrl is not null) user.PortfolioUrl = req.PortfolioUrl.Trim();
-		if (req.ProfilePictureUrl is not null) user.ProfilePictureUrl = req.ProfilePictureUrl.Trim();
 		if (req.YearsOfExperience is not null) user.YearsOfExperience = req.YearsOfExperience;
 
 		user.UpdatedAt = DateTime.UtcNow;
@@ -51,7 +50,6 @@ public class UpdateFreelancerProfileCommandHandler
 			Skills = user.Skills,
 			PhoneNumber = user.PhoneNumber,
 			PortfolioUrl = user.PortfolioUrl,
-			ProfilePictureUrl = user.ProfilePictureUrl,
 			YearsOfExperience = user.YearsOfExperience,
 			CreatedAt = user.CreatedAt
 		};

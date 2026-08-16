@@ -40,9 +40,6 @@ public class UpdateCompanyProfileCommandHandler
 		if (req.Description is not null)
 			company.Description = req.Description.Trim();
 
-		if (req.LogoUrl is not null)
-			company.LogoUrl = req.LogoUrl.Trim();
-
 		if (req.Website is not null)
 			company.Website = req.Website.Trim();
 

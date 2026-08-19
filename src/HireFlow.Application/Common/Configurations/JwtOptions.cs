@@ -7,10 +7,10 @@ public sealed class JwtOptions
 	public const string SectionName = nameof(JwtOptions);
 
 	[Required]
-	public string Issuer { get; init; }
+	public string Issuer { get; init; } = string.Empty;
 
 	[Required]
-	public string Audience { get; init; }
+	public string Audience { get; init; } = string.Empty;
 
 	[MinLength(32)]
 	public string SecretKey { get; init; } = default!;

@@ -39,12 +39,15 @@ public sealed class SubmitApplicationCommandHandler : IRequestHandler<SubmitAppl
 		if (hasAlreadyApplied)
 			throw new ConflictException("You have already applied to this job.");
 
+		var user = await _db.Users.FindAsync(userId, cancellationToken)
+		?? throw new NotFoundException("User", userId);
+
 		var application = new JobApplication
 		{
 			JobId = command.JobId,
 			UserId = userId,
 			CoverLetter = command.Request.CoverLetter.Trim(),
-			CvUrl = command.Request.CvUrl,
+			CvUrl = user.CvUrl,
 			Status = ApplicationStatus.Pending,
 			CreatedAt = DateTime.UtcNow
 		};

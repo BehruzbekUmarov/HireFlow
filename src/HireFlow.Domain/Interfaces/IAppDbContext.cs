@@ -10,6 +10,7 @@ public interface IAppDbContext
 	DbSet<Job> Jobs { get; }
 	DbSet<JobApplication> JobApplications { get; }
 	DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; }
+	DbSet<FreelancerCv> FreelancerCvs { get; }
 	DbSet<RefreshToken> RefreshTokens { get; }
 	DbSet<PasswordResetToken> PasswordResetTokens { get; }
 

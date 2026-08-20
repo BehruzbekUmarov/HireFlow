@@ -1,10 +1,10 @@
-﻿using HireFlow.Domain.Enums;
+﻿using HireFlow.Domain.Entities.Base;
+using HireFlow.Domain.Enums;
 
 namespace HireFlow.Domain.Entities;
 
-public class ApplicationStatusHistory
+public class ApplicationStatusHistory : EntityBase
 {
-	public long Id { get; set; } 
 	public long ApplicationId { get; set; }
 	public ApplicationStatus OldStatus { get; set; }
 	public ApplicationStatus NewStatus { get; set; }

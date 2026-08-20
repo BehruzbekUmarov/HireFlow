@@ -3,7 +3,6 @@ using HireFlow.Application.DTOs.User;
 using HireFlow.Application.Features.Common.User.Commands.UpdateCompanyLogo;
 using HireFlow.Application.Features.Common.User.Commands.UpdateCompanyProfile;
 using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerAvatar;
-using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerCv;
 using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerProfile;
 using HireFlow.Application.Features.Common.User.Queries.GetCompanyProfile;
 using HireFlow.Application.Features.Common.User.Queries.GetFreelancerProfile;
@@ -82,22 +81,6 @@ public class ProfileController : ControllerBase
 
 		// Set URL internally — user never sees or touches this
 		await _mediator.Send(new UpdateFreelancerAvatarCommand(url));
-
-		return Ok(new { url });
-	}
-
-	[HttpPost("freelancer/cv")]
-	[Authorize(Roles = "Freelancer")]
-	public async Task<ActionResult<string>> UploadCv(IFormFile file)
-	{
-		FileValidator.ValidateCv(file);
-
-		var url = await _fileStorageService.SaveAsync(
-			file.OpenReadStream(),
-			file.FileName,
-			folder: "cvs");
-
-		await _mediator.Send(new UpdateFreelancerCvCommand(url)); // ← clean
 
 		return Ok(new { url });
 	}

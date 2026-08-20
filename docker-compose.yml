@@ -22,6 +22,11 @@ services:
       - RabbitMQ__Password=${RABBITMQ_PASSWORD}
       - Resend__ApiKey=${RESEND_API_KEY}
       - Resend__From=onboarding@resend.dev
+      - FileStorage__BasePath=/app/uploads            
+      - FileStorage__BaseUrl=http://${SERVER_IP}:8080/uploads 
+    volumes:
+      - ./uploads:/app/uploads    
+      - ./logs:/app/logs          
     depends_on:
       postgres:
         condition: service_healthy

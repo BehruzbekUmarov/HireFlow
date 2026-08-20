@@ -13,6 +13,7 @@ public class AppDbContext : DbContext, IAppDbContext
 	public DbSet<Job> Jobs { get; set; }
 	public DbSet<JobApplication> JobApplications { get; set; }
 	public DbSet<Company> Companies { get; set; }
+	public DbSet<FreelancerCv> FreelancerCvs { get; set; }
 	public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; }
 	public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 

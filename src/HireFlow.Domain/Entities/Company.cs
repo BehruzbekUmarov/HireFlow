@@ -1,8 +1,9 @@
-﻿namespace HireFlow.Domain.Entities;
+﻿using HireFlow.Domain.Entities.Base;
 
-public class Company
+namespace HireFlow.Domain.Entities;
+
+public class Company : EntityBase
 {
-	public long Id { get; set; }
 	public long UserId { get; set; }
 
 	public string Name { get; set; } 

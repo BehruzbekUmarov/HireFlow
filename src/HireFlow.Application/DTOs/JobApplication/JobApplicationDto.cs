@@ -1,4 +1,6 @@
-﻿namespace HireFlow.Application.DTOs.JobApplication;
+﻿using HireFlow.Application.DTOs.Cv.Responses;
+
+namespace HireFlow.Application.DTOs.JobApplication;
 
 public class JobApplicationDto
 {
@@ -13,5 +15,7 @@ public class JobApplicationDto
 	public string Status { get; set; } = string.Empty;
 	public DateTime CreatedAt { get; set; }
 	public DateTime? UpdatedAt { get; set; }
+
+	public CvDto? Cv { get; set; }
 	public List<StatusHistoryDto> StatusHistory { get; set; } = [];
 }

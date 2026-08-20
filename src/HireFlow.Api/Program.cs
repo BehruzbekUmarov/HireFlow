@@ -6,6 +6,7 @@ using HireFlow.Infrastructure.Extensions;
 using HireFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -79,10 +80,9 @@ try
 	var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
 	Directory.CreateDirectory(uploadsPath);
 
-	// Serve files from /uploads URL path
 	app.UseStaticFiles(new StaticFileOptions
 	{
-		FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+		FileProvider = new PhysicalFileProvider(uploadsPath),
 		RequestPath = "/uploads"
 	});
 

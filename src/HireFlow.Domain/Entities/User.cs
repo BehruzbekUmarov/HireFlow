@@ -15,7 +15,6 @@ public class User
 	public int? YearsOfExperience { get; set; }
 	public string? PhoneNumber { get; set; }        
 	public string? ProfilePictureUrl { get; set; }
-	public string? CvUrl { get; set; }
 	public UserRole Role { get; set; }
 	public bool IsDeleted { get; set; }
 	public DateTime CreatedAt { get; set; }
@@ -23,7 +22,8 @@ public class User
 	public DateTime? DeletedAt { get; set; }
 
 	public Company? Company { get; set; }
-	public List<JobApplication> JobApplications { get; set; } 
+	public List<JobApplication> JobApplications { get; set; }
+	public List<FreelancerCv> Cvs { get; set; } 
 	public List<RefreshToken> RefreshTokens { get; set; }
 	public List<PasswordResetToken> PasswordResetTokens { get; set; }
 
@@ -35,6 +35,7 @@ public class User
 		IsDeleted = false;
 		CreatedAt = DateTime.UtcNow;
 		JobApplications = [];
+		Cvs = [];
 		RefreshTokens = [];
 		PasswordResetTokens = [];
 	} 

@@ -19,9 +19,6 @@ public class JobApplicationConfiguration : IEntityTypeConfiguration<JobApplicati
 			   .HasMaxLength(3000)
 			   .IsRequired();
 
-		builder.Property(a => a.CvUrl)
-			   .HasMaxLength(500);  
-
 		builder.Property(a => a.Status)
 			   .HasConversion<string>()
 			   .HasMaxLength(20)

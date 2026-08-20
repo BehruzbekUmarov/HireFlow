@@ -3,4 +3,5 @@
 public class SubmitApplicationRequest
 {
 	public string CoverLetter { get; set; } = string.Empty;
+	public long? CvId { get; set; }
 }

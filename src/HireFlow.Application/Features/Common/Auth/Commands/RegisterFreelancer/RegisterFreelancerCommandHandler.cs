@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Common.Auth.Commands.RegisterFreelancer;
 
-public class RegisterFreelancerCommandHandler : IRequestHandler<RegisterFreelancerCommand, RegisterResponse>
+public sealed class RegisterFreelancerCommandHandler : IRequestHandler<RegisterFreelancerCommand, RegisterResponse>
 {
 	private readonly IAppDbContext _db;
 	private readonly IPasswordHasher _passwordHasher;

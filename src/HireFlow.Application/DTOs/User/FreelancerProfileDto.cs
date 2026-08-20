@@ -10,7 +10,6 @@ public class FreelancerProfileDto
 	public string? PhoneNumber { get; set; }
 	public string? PortfolioUrl { get; set; }
 	public string? ProfilePictureUrl { get; set; }
-	public string? CvUrl { get; set; }
 	public int? YearsOfExperience { get; set; }
 	public DateTime CreatedAt { get; set; }
 }

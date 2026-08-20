@@ -65,6 +65,8 @@ try
 	builder.Services.AddProblemDetails();
 	builder.Services.AddHttpContextAccessor();
 
+	builder.Services.AddHealthChecksConfiguration(builder.Configuration);
+
 	var app = builder.Build();
 
 	app.UseSerilogRequestLogging(options =>
@@ -87,12 +89,12 @@ try
 	app.UseSwagger();
 	app.UseSwaggerUI();
 
-	app.UseErrorHandler();
 	app.UseCors("AllowAngular");
 	app.UseRateLimiter();
 	app.UseAuthentication();
 	app.UseAuthorization();
 	app.MapControllers();
+	app.UseErrorHandler();
 
 	using (var scope = app.Services.CreateScope())
 	{

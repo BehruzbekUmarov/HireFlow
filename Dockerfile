@@ -6,6 +6,7 @@ COPY src/HireFlow.Domain/HireFlow.Domain.csproj src/HireFlow.Domain/
 COPY src/HireFlow.Application/HireFlow.Application.csproj src/HireFlow.Application/
 COPY src/HireFlow.Infrastructure/HireFlow.Infrastructure.csproj src/HireFlow.Infrastructure/
 COPY src/HireFlow.Api/HireFlow.Api.csproj src/HireFlow.Api/
+COPY tests/HireFlow.Tests/HireFlow.Tests.csproj tests/HireFlow.Tests/
 
 RUN dotnet restore
 

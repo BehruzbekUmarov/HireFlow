@@ -1,15 +1,17 @@
 ﻿using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
-using HireFlow.Infrastructure.Caching;
-using HireFlow.Infrastructure.Email;
+using HireFlow.Infrastructure.Implementations.Caching;
+using HireFlow.Infrastructure.Implementations.Documents;
+using HireFlow.Infrastructure.Implementations.Email;
+using HireFlow.Infrastructure.Implementations.Storage;
 using HireFlow.Infrastructure.Messaging;
 using HireFlow.Infrastructure.Persistence;
 using HireFlow.Infrastructure.Security;
-using HireFlow.Infrastructure.Storage;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using QuestPDF.Infrastructure;
 using StackExchange.Redis;
 
 namespace HireFlow.Infrastructure.Extensions;
@@ -40,6 +42,7 @@ public static class DependencyInjection
 		services.AddScoped<ITokenService, TokenService>();
 		services.AddScoped<ICurrentUser, CurrentUser>();
 		services.AddScoped<IFileStorageService, LocalFileStorageService>();
+		services.AddScoped<ICvPdfService, CvPdfService>();
 
 		// ---------- Email ----------
 		services.AddHttpClient<IEmailService, ResendEmailService>();
@@ -63,6 +66,8 @@ public static class DependencyInjection
 				cfg.ConfigureEndpoints(context);
 			});
 		});
+
+		QuestPDF.Settings.License = LicenseType.Community;
 
 		return services;
 	}

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System.Text.Json;
 
-namespace HireFlow.Infrastructure.Caching;
+namespace HireFlow.Infrastructure.Implementations.Caching;
 
 public class RedisCacheService : ICacheService
 {

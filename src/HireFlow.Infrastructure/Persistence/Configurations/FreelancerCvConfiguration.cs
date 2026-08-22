@@ -22,6 +22,7 @@ public class FreelancerCvConfiguration : IEntityTypeConfiguration<FreelancerCv>
 		builder.Property(c => c.Education).HasMaxLength(2000);
 		builder.Property(c => c.Languages).HasMaxLength(500);
 		builder.Property(c => c.PortfolioUrl).HasMaxLength(500);
+		builder.Property(c => c.Projects).HasMaxLength(5000);
 
 		builder.HasOne(c => c.User)
 			   .WithMany(u => u.Cvs)

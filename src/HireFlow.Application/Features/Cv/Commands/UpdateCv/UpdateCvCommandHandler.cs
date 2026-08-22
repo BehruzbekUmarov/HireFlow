@@ -50,6 +50,7 @@ public class UpdateCvCommandHandler : IRequestHandler<UpdateCvCommand, CvDto>
 		cv.Skills = req.Skills?.Trim();
 		cv.Experience = req.Experience?.Trim();
 		cv.Education = req.Education?.Trim();
+		cv.Projects = req.Projects?.Trim();
 		cv.Languages = req.Languages?.Trim();
 		cv.PortfolioUrl = req.PortfolioUrl?.Trim();
 		cv.YearsOfExperience = req.YearsOfExperience;

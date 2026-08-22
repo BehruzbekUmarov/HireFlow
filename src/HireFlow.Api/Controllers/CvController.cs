@@ -6,6 +6,7 @@ using HireFlow.Application.Features.Cv.Commands.DeleteCv;
 using HireFlow.Application.Features.Cv.Commands.SetDefaultCv;
 using HireFlow.Application.Features.Cv.Commands.UpdateCv;
 using HireFlow.Application.Features.Cv.Commands.UploadCvFile;
+using HireFlow.Application.Features.Cv.Queries.DownloadCv;
 using HireFlow.Application.Features.Cv.Queries.GetCvById;
 using HireFlow.Application.Features.Cv.Queries.GetMyCvs;
 using HireFlow.Application.Services.Interfaces;
@@ -86,5 +87,19 @@ public class CvController : ControllerBase
 
 		var result = await _mediator.Send(new UploadCvFileCommand(url, title));
 		return Ok(result);
+	}
+
+	[HttpGet("{id}/download")]
+	[Authorize(Roles = "Freelancer")]
+	public async Task<IActionResult> Download(long id)
+	{
+		var result = await _mediator.Send(new DownloadCvQuery(id));
+
+		// Uploaded file — redirect directly
+		if (result.FileUrl is not null)
+			return Redirect(result.FileUrl);
+
+		// Generated PDF — return as file download
+		return File(result.PdfBytes!, "application/pdf", result.FileName);
 	}
 }

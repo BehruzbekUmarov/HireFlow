@@ -1,7 +1,7 @@
 ﻿using HireFlow.Application.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 
-namespace HireFlow.Infrastructure.Storage;
+namespace HireFlow.Infrastructure.Implementations.Storage;
 
 public class LocalFileStorageService : IFileStorageService
 {

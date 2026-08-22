@@ -3,6 +3,7 @@ using HireFlow.Application.Extensions;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Extensions;
+using HireFlow.Infrastructure.Hubs;
 using HireFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -66,10 +67,19 @@ try
 	builder.Services.AddProblemDetails();
 	builder.Services.AddHttpContextAccessor();
 
+	builder.Services.AddCors(options =>
+	options.AddPolicy("AllowAngular",
+		policy => policy
+			.WithOrigins("http://localhost:4200")
+			.AllowAnyHeader()
+			.AllowAnyMethod()
+			.AllowCredentials())); 
+
 	builder.Services.AddHealthChecksConfiguration(builder.Configuration);
 
 	var app = builder.Build();
 
+	app.UseErrorHandler();
 	app.UseSerilogRequestLogging(options =>
 	{
 		options.MessageTemplate =
@@ -80,21 +90,29 @@ try
 	var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
 	Directory.CreateDirectory(uploadsPath);
 
+	app.UseDefaultFiles();   // serves index.html by default
+
+	// wwwroot static files (your HTML/JS/CSS test UI)
+	app.UseStaticFiles();    // ← add this for wwwroot
+
+	// uploads static files
 	app.UseStaticFiles(new StaticFileOptions
 	{
 		FileProvider = new PhysicalFileProvider(uploadsPath),
 		RequestPath = "/uploads"
 	});
 
-	app.UseSwagger();
-	app.UseSwaggerUI();
+	if (app.Environment.IsDevelopment())
+	{
+		app.UseSwagger();
+		app.UseSwaggerUI();
+	}
 
-	app.UseCors("AllowAngular");
 	app.UseRateLimiter();
 	app.UseAuthentication();
 	app.UseAuthorization();
 	app.MapControllers();
-	app.UseErrorHandler();
+	app.MapHub<ChatHub>("/hubs/chat");
 
 	using (var scope = app.Services.CreateScope())
 	{

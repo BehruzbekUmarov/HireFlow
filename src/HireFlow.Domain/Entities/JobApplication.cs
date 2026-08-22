@@ -18,6 +18,7 @@ public class JobApplication
 	public Job? Job { get; set; } 
 	public User? User { get; set; }
 	public FreelancerCv? Cv { get; set; }
+	public List<Message> Messages { get; set; } 
 	public List<ApplicationStatusHistory> StatusHistory { get; set; }
 
 	public JobApplication()
@@ -26,5 +27,6 @@ public class JobApplication
 		Status = ApplicationStatus.Pending;
 		CreatedAt = DateTime.UtcNow;
 		StatusHistory = [];
+		Messages = [];
 	}
 }

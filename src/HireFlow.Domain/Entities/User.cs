@@ -23,7 +23,8 @@ public class User
 
 	public Company? Company { get; set; }
 	public List<JobApplication> JobApplications { get; set; }
-	public List<FreelancerCv> Cvs { get; set; } 
+	public List<FreelancerCv> Cvs { get; set; }
+	public List<Message> SentMessages { get; set; } 
 	public List<RefreshToken> RefreshTokens { get; set; }
 	public List<PasswordResetToken> PasswordResetTokens { get; set; }
 
@@ -36,6 +37,7 @@ public class User
 		CreatedAt = DateTime.UtcNow;
 		JobApplications = [];
 		Cvs = [];
+		SentMessages = [];	
 		RefreshTokens = [];
 		PasswordResetTokens = [];
 	} 

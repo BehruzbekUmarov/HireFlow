@@ -1,6 +1,7 @@
 ﻿using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using HireFlow.Infrastructure.Implementations.Caching;
+using HireFlow.Infrastructure.Implementations.Chat;
 using HireFlow.Infrastructure.Implementations.Documents;
 using HireFlow.Infrastructure.Implementations.Email;
 using HireFlow.Infrastructure.Implementations.Storage;
@@ -43,6 +44,7 @@ public static class DependencyInjection
 		services.AddScoped<ICurrentUser, CurrentUser>();
 		services.AddScoped<IFileStorageService, LocalFileStorageService>();
 		services.AddScoped<ICvPdfService, CvPdfService>();
+		services.AddScoped<IChatNotificationService, ChatNotificationService>();
 
 		// ---------- Email ----------
 		services.AddHttpClient<IEmailService, ResendEmailService>();

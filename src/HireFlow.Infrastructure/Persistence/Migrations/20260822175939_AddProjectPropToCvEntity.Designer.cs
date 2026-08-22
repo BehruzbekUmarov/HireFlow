@@ -3,6 +3,7 @@ using System;
 using HireFlow.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace HireFlow.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260822175939_AddProjectPropToCvEntity")]
+    partial class AddProjectPropToCvEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -290,44 +293,6 @@ namespace HireFlow.Infrastructure.Persistence.Migrations
                     b.ToTable("job_applications", (string)null);
                 });
 
-            modelBuilder.Entity("HireFlow.Domain.Entities.Message", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<long>("ApplicationId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<bool>("IsRead")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<long>("SenderId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationId");
-
-                    b.HasIndex("SenderId");
-
-                    b.HasIndex("ApplicationId", "SentAt");
-
-                    b.ToTable("messages", (string)null);
-                });
-
             modelBuilder.Entity("HireFlow.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.Property<long>("Id")
@@ -533,25 +498,6 @@ namespace HireFlow.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HireFlow.Domain.Entities.Message", b =>
-                {
-                    b.HasOne("HireFlow.Domain.Entities.JobApplication", "Application")
-                        .WithMany("Messages")
-                        .HasForeignKey("ApplicationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HireFlow.Domain.Entities.User", "Sender")
-                        .WithMany("SentMessages")
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Application");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("HireFlow.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.HasOne("HireFlow.Domain.Entities.User", "User")
@@ -591,8 +537,6 @@ namespace HireFlow.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("HireFlow.Domain.Entities.JobApplication", b =>
                 {
-                    b.Navigation("Messages");
-
                     b.Navigation("StatusHistory");
                 });
 
@@ -607,8 +551,6 @@ namespace HireFlow.Infrastructure.Persistence.Migrations
                     b.Navigation("PasswordResetTokens");
 
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("SentMessages");
                 });
 #pragma warning restore 612, 618
         }

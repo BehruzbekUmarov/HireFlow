@@ -12,6 +12,8 @@ internal static class DependencyInjection
 		AddOptions(services, configuration);
 		AddAuthentication(services, configuration);
 
+		services.AddSignalR();
+
 		return services;
 	}
 

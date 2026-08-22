@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
-namespace HireFlow.Infrastructure.Email;
+namespace HireFlow.Infrastructure.Implementations.Email;
 
 public class ResendEmailService : IEmailService
 {

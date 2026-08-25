@@ -17,7 +17,6 @@ public static class JobApplicationMapping
 		UserId = a.UserId,
 		ApplicantName = a.User!.FullName,
 		CoverLetter = a.CoverLetter,
-		// Remove CvUrl — add full CV data instead:
 		Cv = a.Cv == null ? null : new CvDto
 		{
 			Id = a.Cv.Id,

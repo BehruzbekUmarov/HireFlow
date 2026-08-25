@@ -1,8 +1,6 @@
 ﻿using FluentValidation;
 
 namespace HireFlow.Application.Common.Validators.Auth;
-
-// Place this file next to your RegisterFreelancerCommand.cs
 public class RegisterFreelancerCommandValidator : AbstractValidator<RegisterFreelancerCommand>
 {
 	public RegisterFreelancerCommandValidator()

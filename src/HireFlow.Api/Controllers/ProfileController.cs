@@ -27,7 +27,6 @@ public class ProfileController : ControllerBase
 		_fileStorageService = fileStorageService;
 	}
 
-	// GET api/profile/freelancer
 	[HttpGet("freelancer")]
 	[Authorize(Roles = "Freelancer")]
 	public async Task<ActionResult<FreelancerProfileDto>> GetFreelancerProfile()
@@ -36,7 +35,6 @@ public class ProfileController : ControllerBase
 		return Ok(result);
 	}
 
-	// PUT api/profile/freelancer
 	[HttpPut("freelancer")]
 	[Authorize(Roles = "Freelancer")]
 	public async Task<ActionResult<FreelancerProfileDto>> UpdateFreelancerProfile(
@@ -47,7 +45,6 @@ public class ProfileController : ControllerBase
 		return Ok(result);
 	}
 
-	// GET api/profile/company
 	[HttpGet("company")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<CompanyProfileDto>> GetCompanyProfile()
@@ -56,7 +53,6 @@ public class ProfileController : ControllerBase
 		return Ok(result);
 	}
 
-	// PUT api/profile/company
 	[HttpPut("company")]
 	[Authorize(Roles = "Company")]
 	public async Task<ActionResult<CompanyProfileDto>> UpdateCompanyProfile(
@@ -73,13 +69,11 @@ public class ProfileController : ControllerBase
 	{
 		FileValidator.ValidateImage(file);
 
-		// Save file → get URL
 		var url = await _fileStorageService.SaveAsync(
 			file.OpenReadStream(),
 			file.FileName,
 			folder: "avatars");
 
-		// Set URL internally — user never sees or touches this
 		await _mediator.Send(new UpdateFreelancerAvatarCommand(url));
 
 		return Ok(new { url });

@@ -18,7 +18,6 @@ public class ChatController : ControllerBase
 
 	public ChatController(IMediator mediator) => _mediator = mediator;
 
-	// GET api/applications/5/messages
 	[HttpGet]
 	public async Task<ActionResult<ConversationDto>> GetConversation(long applicationId)
 	{
@@ -26,7 +25,6 @@ public class ChatController : ControllerBase
 		return Ok(result);
 	}
 
-	// POST api/applications/5/messages
 	[HttpPost]
 	public async Task<ActionResult<MessageDto>> Send(
 		long applicationId, SendMessageRequest request)
@@ -36,7 +34,6 @@ public class ChatController : ControllerBase
 		return Ok(result);
 	}
 
-	// PATCH api/applications/5/messages/read
 	[HttpPatch("read")]
 	public async Task<IActionResult> MarkAsRead(long applicationId)
 	{

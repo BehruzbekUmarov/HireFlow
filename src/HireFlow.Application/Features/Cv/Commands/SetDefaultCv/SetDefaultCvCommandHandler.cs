@@ -29,7 +29,6 @@ public class SetDefaultCvCommandHandler : IRequestHandler<SetDefaultCvCommand>
 		if (cv.UserId != userId)
 			throw new ForbiddenException("You can only update your own CVs.");
 
-		// Remove default from all others
 		var others = await _db.FreelancerCvs
 			.Where(c => c.UserId == userId && c.IsDefault)
 			.ToListAsync(cancellationToken);

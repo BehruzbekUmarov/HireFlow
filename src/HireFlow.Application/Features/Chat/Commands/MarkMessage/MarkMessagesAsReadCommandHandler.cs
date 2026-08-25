@@ -23,7 +23,6 @@ public class MarkMessagesAsReadCommandHandler
 	{
 		var userId = _currentUser.UserId;
 
-		// Mark all messages NOT sent by current user as read
 		var unread = await _db.Messages
 			.Where(m => m.ApplicationId == command.ApplicationId
 					 && m.SenderId != userId

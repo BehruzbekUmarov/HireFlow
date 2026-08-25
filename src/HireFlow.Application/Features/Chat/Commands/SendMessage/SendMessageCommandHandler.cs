@@ -15,12 +15,12 @@ public class SendMessageCommandHandler
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
-	private readonly IChatNotificationService _chatNotification; // ← add
+	private readonly IChatNotificationService _chatNotification; 
 
 	public SendMessageCommandHandler(
 		IAppDbContext db,
 		ICurrentUser currentUser,
-		IChatNotificationService chatNotification) // ← add
+		IChatNotificationService chatNotification) 
 	{
 		_db = db;
 		_currentUser = currentUser;
@@ -77,7 +77,6 @@ public class SendMessageCommandHandler
 			IsOwnMessage = true
 		};
 
-		// Push to all connected clients in this conversation instantly
 		await _chatNotification.SendMessageToConversation(
 			command.ApplicationId, messageDto);
 

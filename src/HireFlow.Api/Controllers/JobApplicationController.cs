@@ -72,7 +72,6 @@ public class JobApplicationsController : ControllerBase
 		return Ok(result);
 	}
 
-	// PATCH api/applications/5/withdraw
 	[HttpPatch("{id}/withdraw")]
 	[Authorize(Roles = "Freelancer")]
 	public async Task<IActionResult> Withdraw(long id)

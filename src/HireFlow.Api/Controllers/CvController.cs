@@ -95,7 +95,6 @@ public class CvController : ControllerBase
 	{
 		var result = await _mediator.Send(new DownloadCvQuery(id));
 
-		// Uploaded file — redirect directly
 		if (result.FileUrl is not null)
 			return Redirect(result.FileUrl);
 

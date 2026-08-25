@@ -36,11 +36,9 @@ public class DownloadCvQueryHandler : IRequestHandler<DownloadCvQuery, CvDownloa
 
 		var fileName = $"{cv.User!.FullName.Replace(" ", "_")}_CV.pdf";
 
-		// Uploaded file — return URL, no generation needed
 		if (!string.IsNullOrEmpty(cv.FileUrl))
 			return new CvDownloadResult { FileUrl = cv.FileUrl, FileName = fileName };
 
-		// Generate PDF from structured data
 		var cvDto = CreateCvCommandHandler.MapToDto(cv);
 
 		var pdfBytes = _pdfService.Generate(

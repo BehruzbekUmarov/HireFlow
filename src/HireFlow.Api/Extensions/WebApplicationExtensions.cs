@@ -27,7 +27,7 @@ public static class WebApplicationExtensions
 
 		app.MapHealthChecks("/health/live", new HealthCheckOptions
 		{
-			Predicate = _ => false  // just checks if app is running
+			Predicate = _ => false  
 		});
 
 		app.UseMiddleware<ErrorHandlerMiddleware>();

@@ -33,7 +33,6 @@ public class GetConversationQueryHandler
 			.FirstOrDefaultAsync(a => a.Id == query.ApplicationId, cancellationToken)
 			?? throw new NotFoundException("Application", query.ApplicationId);
 
-		// Only freelancer who applied OR company that owns the job can view
 		var isFreelancer = application.UserId == userId;
 		var isCompany = application.Job?.Company?.UserId == userId;
 

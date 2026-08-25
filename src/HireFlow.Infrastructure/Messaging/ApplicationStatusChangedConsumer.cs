@@ -39,9 +39,6 @@ public class ApplicationStatusChangedConsumer : IConsumer<ApplicationStatusChang
 		}
 		catch (Exception ex)
 		{
-			// MassTransit will automatically retry failed messages.
-			// Rethrowing here tells MassTransit the message was NOT processed
-			// successfully — it will retry according to the retry policy.
 			_logger.LogError(ex, "Failed to send email to {Email}", evt.FreelancerEmail);
 			throw;
 		}

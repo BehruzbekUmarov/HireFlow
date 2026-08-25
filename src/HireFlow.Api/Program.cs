@@ -86,16 +86,13 @@ try
 			"HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0}ms)";
 	});
 
-	// Create uploads folder if it doesn't exist
 	var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
 	Directory.CreateDirectory(uploadsPath);
 
-	app.UseDefaultFiles();   // serves index.html by default
+	app.UseDefaultFiles();   
 
-	// wwwroot static files (your HTML/JS/CSS test UI)
-	app.UseStaticFiles();    // ← add this for wwwroot
+	app.UseStaticFiles();
 
-	// uploads static files
 	app.UseStaticFiles(new StaticFileOptions
 	{
 		FileProvider = new PhysicalFileProvider(uploadsPath),

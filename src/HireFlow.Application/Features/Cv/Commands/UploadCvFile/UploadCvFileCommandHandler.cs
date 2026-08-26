@@ -1,5 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Cv.Responses;
 using HireFlow.Application.Features.Cv.Commands.CreateCv;
+using HireFlow.Application.Features.Cv.Dtos;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
 using HireFlow.Domain.Interfaces;
@@ -39,6 +40,6 @@ public class UploadCvFileCommandHandler : IRequestHandler<UploadCvFileCommand, C
 		_db.FreelancerCvs.Add(cv);
 		await _db.SaveChangesAsync(ct);
 
-		return CreateCvCommandHandler.MapToDto(cv);
+		return CvMapper.MapToDto(cv);
 	}
 }

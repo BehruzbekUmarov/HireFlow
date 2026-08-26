@@ -6,29 +6,37 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerAvatar;
 
-public class UpdateFreelancerAvatarCommandHandler
+public sealed class UpdateFreelancerAvatarCommandHandler
 	: IRequestHandler<UpdateFreelancerAvatarCommand>
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
 
-	public UpdateFreelancerAvatarCommandHandler(IAppDbContext db, ICurrentUser currentUser)
+	public UpdateFreelancerAvatarCommandHandler(
+		IAppDbContext db,
+		ICurrentUser currentUser)
 	{
 		_db = db;
 		_currentUser = currentUser;
 	}
 
-
 	public async Task Handle(
-		UpdateFreelancerAvatarCommand command, CancellationToken ct)
+		UpdateFreelancerAvatarCommand command,
+		CancellationToken cancellationToken)
 	{
+		var userId = _currentUser.UserId;
+
 		var user = await _db.Users
-			.FirstOrDefaultAsync(u => u.Id == _currentUser.UserId, ct)
-			?? throw new NotFoundException("User", _currentUser.UserId);
+			.FirstOrDefaultAsync(
+				u => u.Id == userId,
+				cancellationToken)
+			?? throw new NotFoundException(
+				"User",
+				userId);
 
 		user.ProfilePictureUrl = command.Url;
 		user.UpdatedAt = DateTime.UtcNow;
 
-		await _db.SaveChangesAsync(ct);
+		await _db.SaveChangesAsync(cancellationToken);
 	}
 }

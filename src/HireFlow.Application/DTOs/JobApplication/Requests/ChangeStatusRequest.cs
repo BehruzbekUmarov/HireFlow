@@ -1,6 +1,6 @@
 ﻿using HireFlow.Domain.Enums;
 
-namespace HireFlow.Application.DTOs.JobApplication;
+namespace HireFlow.Application.DTOs.JobApplication.Requests;
 
 public class ChangeStatusRequest
 {

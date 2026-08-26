@@ -20,8 +20,11 @@ public class GetMyCvsQueryHandler : IRequestHandler<GetMyCvsQuery, List<CvDto>>
 	public async Task<List<CvDto>> Handle(
 		GetMyCvsQuery query, CancellationToken cancellationToken)
 	{
+		var userId = _currentUser.UserId;
+
 		return await _db.FreelancerCvs
-			.Where(c => c.UserId == _currentUser.UserId)
+			.AsNoTracking()
+			.Where(c => c.UserId == userId)
 			.OrderByDescending(c => c.IsDefault)
 			.ThenByDescending(c => c.CreatedAt)
 			.Select(c => new CvDto

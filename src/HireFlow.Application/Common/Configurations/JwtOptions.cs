@@ -21,5 +21,5 @@ public sealed class JwtOptions
 
 	[Range(7, 30, ErrorMessage =
 		"Refresh token expiration must be between 7 day and 30 days")]
-	public int RefreshTokenDays { get; set; }
+	public int RefreshTokenDays { get; init; }
 }

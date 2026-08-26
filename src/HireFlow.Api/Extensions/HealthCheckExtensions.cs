@@ -8,18 +8,17 @@ public static class HealthCheckExtensions
 		this IServiceCollection services,
 		IConfiguration configuration)
 	{
-		services.AddHealthChecks()
-
+		services
+			.AddHealthChecks()
 			.AddNpgSql(
-				connectionString: configuration
-					.GetConnectionString("DefaultConnection")!,
+				connectionString:
+					configuration.GetConnectionString("DefaultConnection")!,
 				name: "postgresql",
 				failureStatus: HealthStatus.Unhealthy,
 				tags: ["database"])
-
 			.AddRedis(
-				redisConnectionString: configuration
-					.GetConnectionString("Redis")!,
+				redisConnectionString:
+					configuration.GetConnectionString("Redis")!,
 				name: "redis",
 				failureStatus: HealthStatus.Degraded,
 				tags: ["cache"]);

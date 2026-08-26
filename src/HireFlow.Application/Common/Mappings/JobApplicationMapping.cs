@@ -1,5 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Cv.Responses;
 using HireFlow.Application.DTOs.JobApplication;
+using HireFlow.Application.DTOs.JobApplication.Responses;
 using HireFlow.Domain.Entities;
 using System.Linq.Expressions;
 

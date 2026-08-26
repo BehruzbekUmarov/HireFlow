@@ -6,9 +6,10 @@ using HireFlow.Domain.Interfaces;
 using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 
 namespace HireFlow.Application.Features.Common.Auth.Commands.ForgetPassword;
-public class ForgotPasswordCommandHandler
+public sealed class ForgotPasswordCommandHandler
 	: IRequestHandler<ForgotPasswordCommand, ForgotPasswordResponse>
 {
 	private readonly IAppDbContext _db;
@@ -49,13 +50,16 @@ public class ForgotPasswordCommandHandler
 
 		var tokenHash = _tokenService.HashToken(code);
 
+		var now = DateTime.UtcNow;
+		var expiresAt = now.AddMinutes(15);
+
 		_db.PasswordResetTokens.Add(new PasswordResetToken
 		{
 			UserId = user.Id,
 			TokenHash = tokenHash,
-			ExpiresAt = DateTime.UtcNow.AddMinutes(15), 
+			ExpiresAt =expiresAt, 
 			Used = false,
-			CreatedAt = DateTime.UtcNow
+			CreatedAt = now
 		});
 
 		await _db.SaveChangesAsync(cancellationToken);
@@ -65,7 +69,7 @@ public class ForgotPasswordCommandHandler
 			ToEmail = user.Email,
 			FullName = user.FullName,
 			RawToken = code,
-			ExpiresAt = DateTime.UtcNow.AddMinutes(15)
+			ExpiresAt = expiresAt
 		}, cancellationToken);
 
 		return new ForgotPasswordResponse
@@ -76,6 +80,8 @@ public class ForgotPasswordCommandHandler
 
 	private static string GenerateCode()
 	{
-		return Random.Shared.Next(100000, 999999).ToString();
+		return RandomNumberGenerator
+			.GetInt32(100000, 1000000)
+			.ToString();
 	}
 }

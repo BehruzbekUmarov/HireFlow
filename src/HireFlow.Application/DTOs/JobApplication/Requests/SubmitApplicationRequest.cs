@@ -1,4 +1,4 @@
-﻿namespace HireFlow.Application.DTOs.JobApplication;
+﻿namespace HireFlow.Application.DTOs.JobApplication.Requests;
 
 public class SubmitApplicationRequest
 {

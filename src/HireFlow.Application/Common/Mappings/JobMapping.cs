@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.DTOs.Job;
+﻿using HireFlow.Application.DTOs.Job.Responses;
 using HireFlow.Domain.Entities;
 using System.Linq.Expressions;
 

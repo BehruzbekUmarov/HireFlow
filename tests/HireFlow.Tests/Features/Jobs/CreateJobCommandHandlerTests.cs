@@ -1,5 +1,6 @@
 using FluentAssertions;
 using HireFlow.Application.DTOs.Job;
+using HireFlow.Application.DTOs.Job.Requests;
 using HireFlow.Application.Features.Job.Commands.CreateJob;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;

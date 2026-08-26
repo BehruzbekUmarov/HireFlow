@@ -1,14 +1,7 @@
 using HireFlow.Api.Extensions;
-using HireFlow.Application.Extensions;
-using HireFlow.Application.Services.Interfaces;
-using HireFlow.Domain.Interfaces;
-using HireFlow.Infrastructure.Extensions;
 using HireFlow.Infrastructure.Hubs;
-using HireFlow.Infrastructure.Persistence;
-using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.OpenApi.Models;
+using HireFlow.Application.Extensions;
+using HireFlow.Infrastructure.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -19,85 +12,35 @@ try
 {
 	var builder = WebApplication.CreateBuilder(args);
 
-	builder.Host.ConfigureSerilog(); 
+	builder.Host.ConfigureSerilog();
+
+	builder.Services.AddHealthChecksConfiguration(
+	builder.Configuration);
+
+	// -----------------------------------------
+	// Services
+	// -----------------------------------------
 
 	builder.Services
 		.AddApplication()
 		.AddInfrastructure(builder.Configuration)
 		.RegisterApi(builder.Configuration);
 
-	builder.Services.AddRateLimiter(options =>
-		options.AddFixedWindowLimiter("auth", opt =>
-		{
-			opt.PermitLimit = 5;
-			opt.Window = TimeSpan.FromMinutes(1);
-		}));
-
-	builder.Services.AddControllers();
-	builder.Services.AddEndpointsApiExplorer();
-
-	builder.Services.AddSwaggerGen(options =>
-	{
-		options.SwaggerDoc("v1", new OpenApiInfo { Title = "HireFlow API", Version = "v1" });
-		options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-		{
-			Name = "Authorization",
-			Type = SecuritySchemeType.Http,
-			Scheme = "Bearer",
-			BearerFormat = "JWT",
-			In = ParameterLocation.Header,
-			Description = "Enter your JWT token."
-		});
-		options.AddSecurityRequirement(new OpenApiSecurityRequirement
-		{
-			{
-				new OpenApiSecurityScheme
-				{
-					Reference = new OpenApiReference
-					{
-						Type = ReferenceType.SecurityScheme,
-						Id = "Bearer"
-					}
-				},
-				[]
-			}
-		});
-	});
-
-	builder.Services.AddProblemDetails();
-	builder.Services.AddHttpContextAccessor();
-
-	builder.Services.AddCors(options =>
-	options.AddPolicy("AllowAngular",
-		policy => policy
-			.WithOrigins("http://localhost:4200")
-			.AllowAnyHeader()
-			.AllowAnyMethod()
-			.AllowCredentials())); 
-
-	builder.Services.AddHealthChecksConfiguration(builder.Configuration);
-
 	var app = builder.Build();
 
+	// -----------------------------------------
+	// Middleware
+	// -----------------------------------------
+
 	app.UseErrorHandler();
+
 	app.UseSerilogRequestLogging(options =>
 	{
 		options.MessageTemplate =
 			"HTTP {RequestMethod} {RequestPath} → {StatusCode} ({Elapsed:0.0}ms)";
 	});
 
-	var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
-	Directory.CreateDirectory(uploadsPath);
-
-	app.UseDefaultFiles();   
-
-	app.UseStaticFiles();
-
-	app.UseStaticFiles(new StaticFileOptions
-	{
-		FileProvider = new PhysicalFileProvider(uploadsPath),
-		RequestPath = "/uploads"
-	});
+	app.UseFileStorage();
 
 	if (app.Environment.IsDevelopment())
 	{
@@ -105,22 +48,29 @@ try
 		app.UseSwaggerUI();
 	}
 
+	app.UseCors("AllowAngular");
+
 	app.UseRateLimiter();
+
 	app.UseAuthentication();
 	app.UseAuthorization();
+
+	// -----------------------------------------
+	// Endpoints
+	// -----------------------------------------
+
 	app.MapControllers();
 	app.MapHub<ChatHub>("/hubs/chat");
 
-	using (var scope = app.Services.CreateScope())
-	{
-		var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-		await dbContext.Database.MigrateAsync();
+	// -----------------------------------------
+	// Database
+	// -----------------------------------------
 
-		var db = scope.ServiceProvider.GetRequiredService<IAppDbContext>();
-		var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+	await app.InitializeDatabaseAsync();
 
-		await AdminSeeder.SeedAdminUserAsync(db, passwordHasher);
-	}
+	// -----------------------------------------
+	// Run
+	// -----------------------------------------
 
 	await app.RunAsync();
 }

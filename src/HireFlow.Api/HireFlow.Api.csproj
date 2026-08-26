@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\HireFlow.Application\HireFlow.Application.csproj" />
     <ProjectReference Include="..\HireFlow.Infrastructure\HireFlow.Infrastructure.csproj" />
   </ItemGroup>
 

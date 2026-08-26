@@ -20,8 +20,7 @@ public sealed class GetUsersQueryHandler : IRequestHandler<GetUsersQuery, PagedR
 
 		var total = await query.CountAsync(cancellationToken);
 
-		var items = await _db.Users
-			.AsNoTracking()
+		var items = await query
 			.OrderByDescending(u => u.CreatedAt)
 			.Skip((request.PageNumber - 1) * request.PageSize)
 			.Take(request.PageSize)

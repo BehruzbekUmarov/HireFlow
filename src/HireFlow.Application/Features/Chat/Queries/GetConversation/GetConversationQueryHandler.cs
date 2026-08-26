@@ -1,4 +1,5 @@
 ﻿using HireFlow.Application.DTOs.Chat.Responses;
+using HireFlow.Application.DTOs.Common;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
@@ -20,28 +21,53 @@ public class GetConversationQueryHandler
 	}
 
 	public async Task<ConversationDto> Handle(
-		GetConversationQuery query, CancellationToken cancellationToken)
+		GetConversationQuery query,
+		CancellationToken cancellationToken)
 	{
 		var userId = _currentUser.UserId;
 
 		var application = await _db.JobApplications
-			.Include(a => a.Job)
-				.ThenInclude(j => j!.Company)
-			.Include(a => a.User)
-			.Include(a => a.Messages)
-				.ThenInclude(m => m.Sender)
-			.FirstOrDefaultAsync(a => a.Id == query.ApplicationId, cancellationToken)
-			?? throw new NotFoundException("Application", query.ApplicationId);
+			.AsNoTracking()
+			.Where(a => a.Id == query.ApplicationId)
+			.Select(a => new
+			{
+				a.Id,
+				JobTitle = a.Job!.Title,
+				CompanyName = a.Job.Company!.Name,
+				FreelancerName = a.User!.FullName,
+				FreelancerId = a.UserId,
+				CompanyUserId = a.Job.Company.UserId
+			})
+			.FirstOrDefaultAsync(cancellationToken)
+			?? throw new NotFoundException(
+				"Application",
+				query.ApplicationId);
 
-		var isFreelancer = application.UserId == userId;
-		var isCompany = application.Job?.Company?.UserId == userId;
+		var isFreelancer = application.FreelancerId == userId;
+		var isCompany = application.CompanyUserId == userId;
 
 		if (!isFreelancer && !isCompany)
+		{
 			throw new ForbiddenException(
 				"You can only view conversations you are part of.");
+		}
 
-		var messages = application.Messages
-			.OrderBy(m => m.SentAt)
+		var messagesQuery = _db.Messages
+			.AsNoTracking()
+			.Where(m => m.ApplicationId == query.ApplicationId);
+
+		var totalMessages = await messagesQuery
+			.CountAsync(cancellationToken);
+
+		var unreadCount = await messagesQuery
+			.CountAsync(
+				m => !m.IsRead && m.SenderId != userId,
+				cancellationToken);
+
+		var messages = await messagesQuery
+			.OrderByDescending(m => m.SentAt)
+			.Skip((query.PageNumber - 1) * query.PageSize)
+			.Take(query.PageSize)
 			.Select(m => new MessageDto
 			{
 				Id = m.Id,
@@ -53,16 +79,26 @@ public class GetConversationQueryHandler
 				SentAt = m.SentAt,
 				IsOwnMessage = m.SenderId == userId
 			})
-			.ToList();
+			.ToListAsync(cancellationToken);
+
+		messages.Reverse();
 
 		return new ConversationDto
 		{
 			ApplicationId = application.Id,
-			JobTitle = application.Job.Title,
-			CompanyName = application.Job.Company.Name,
-			FreelancerName = application.User!.FullName,
-			Messages = messages,
-			UnreadCount = messages.Count(m => !m.IsRead && m.SenderId != userId)
+			JobTitle = application.JobTitle,
+			CompanyName = application.CompanyName,
+			FreelancerName = application.FreelancerName,
+
+			Messages = new PagedResult<MessageDto>
+			{
+				Items = messages,
+				TotalCount = totalMessages,
+				PageNumber = query.PageNumber,
+				PageSize = query.PageSize
+			},
+
+			UnreadCount = unreadCount
 		};
 	}
 }

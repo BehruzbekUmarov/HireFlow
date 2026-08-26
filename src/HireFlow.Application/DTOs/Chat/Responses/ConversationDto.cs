@@ -1,4 +1,6 @@
-﻿namespace HireFlow.Application.DTOs.Chat.Responses;
+﻿using HireFlow.Application.DTOs.Common;
+
+namespace HireFlow.Application.DTOs.Chat.Responses;
 
 public class ConversationDto
 {
@@ -6,6 +8,6 @@ public class ConversationDto
 	public string JobTitle { get; set; } = string.Empty;
 	public string CompanyName { get; set; } = string.Empty;
 	public string FreelancerName { get; set; } = string.Empty;
-	public List<MessageDto> Messages { get; set; } = [];
+	public PagedResult<MessageDto>? Messages { get; set; }
 	public int UnreadCount { get; set; }
 }

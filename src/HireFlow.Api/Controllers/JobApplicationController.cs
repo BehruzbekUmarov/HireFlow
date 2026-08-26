@@ -1,5 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.DTOs.JobApplication;
+using HireFlow.Application.DTOs.JobApplication.Requests;
+using HireFlow.Application.DTOs.JobApplication.Responses;
 using HireFlow.Application.Features.JobApplication.Commands.ChangeApplicationStatus;
 using HireFlow.Application.Features.JobApplication.Commands.WithdrawApplication;
 using HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationById;

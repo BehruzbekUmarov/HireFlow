@@ -1,5 +1,5 @@
 ﻿using HireFlow.Application.Common.Mappings;
-using HireFlow.Application.DTOs.Job;
+using HireFlow.Application.DTOs.Job.Responses;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

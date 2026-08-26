@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Common.Auth.Commands.ResetPassword;
 
-public class ResetPasswordCommandHandler
+public sealed class ResetPasswordCommandHandler
 	: IRequestHandler<ResetPasswordCommand, ResetPasswordResponse>
 {
 	private readonly IAppDbContext _db;
@@ -25,38 +25,56 @@ public class ResetPasswordCommandHandler
 	}
 
 	public async Task<ResetPasswordResponse> Handle(
-		ResetPasswordCommand command, CancellationToken cancellationToken)
+		ResetPasswordCommand command,
+		CancellationToken cancellationToken)
 	{
-		if (command.Request.NewPassword != command.Request.ConfirmPassword)
-			throw new InvalidOperationDomainException("Passwords do not match.");
+		var request = command.Request;
 
-		var tokenHash = _tokenService.HashToken(command.Request.Code);
+		if (request.NewPassword != request.ConfirmPassword)
+		{
+			throw new InvalidOperationDomainException(
+				"Passwords do not match.");
+		}
+
+		var tokenHash = _tokenService.HashToken(request.Code);
+		var now = DateTime.UtcNow;
 
 		var resetToken = await _db.PasswordResetTokens
 			.Include(t => t.User)
-			.FirstOrDefaultAsync(t => t.TokenHash == tokenHash, cancellationToken);
+			.FirstOrDefaultAsync(
+				t => t.TokenHash == tokenHash,
+				cancellationToken);
 
-		if (resetToken is null || resetToken.Used || resetToken.ExpiresAt < DateTime.UtcNow)
+		if (resetToken is null ||
+			resetToken.Used ||
+			resetToken.ExpiresAt <= now)
+		{
 			throw new InvalidOperationDomainException(
 				"Reset code is invalid or has expired. Please request a new one.");
+		}
 
 		resetToken.User!.PasswordHash =
-			_passwordHasher.Hash(command.Request.NewPassword);
+			_passwordHasher.Hash(request.NewPassword);
 
 		resetToken.Used = true;
 
 		var refreshTokens = await _db.RefreshTokens
-			.Where(t => t.UserId == resetToken.UserId && !t.Revoked)
+			.Where(t =>
+				t.UserId == resetToken.UserId &&
+				!t.Revoked)
 			.ToListAsync(cancellationToken);
 
 		foreach (var token in refreshTokens)
+		{
 			token.Revoked = true;
+		}
 
 		await _db.SaveChangesAsync(cancellationToken);
 
 		return new ResetPasswordResponse
 		{
-			Message = "Password reset successfully. Please log in with your new password."
+			Message =
+				"Password reset successfully. Please log in with your new password."
 		};
 	}
 }

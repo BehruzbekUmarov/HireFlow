@@ -1,5 +1,5 @@
 ﻿using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.DTOs.JobApplication;
+using HireFlow.Application.DTOs.JobApplication.Responses;
 using MediatR;
 
 namespace HireFlow.Application.Features.JobApplication.Queries.GetJobApplicationsByUser;

@@ -1,6 +1,6 @@
 ﻿using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.DTOs.JobApplication;
+using HireFlow.Application.DTOs.JobApplication.Responses;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;

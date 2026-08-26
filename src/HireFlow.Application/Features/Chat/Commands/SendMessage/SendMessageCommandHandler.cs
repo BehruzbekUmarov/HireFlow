@@ -15,12 +15,12 @@ public class SendMessageCommandHandler
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
-	private readonly IChatNotificationService _chatNotification; // ← add
+	private readonly IChatNotificationService _chatNotification;
 
 	public SendMessageCommandHandler(
 		IAppDbContext db,
 		ICurrentUser currentUser,
-		IChatNotificationService chatNotification) // ← add
+		IChatNotificationService chatNotification) 
 	{
 		_db = db;
 		_currentUser = currentUser;
@@ -34,12 +34,12 @@ public class SendMessageCommandHandler
 
 		var application = await _db.JobApplications
 			.Include(a => a.Job).ThenInclude(j => j!.Company)
-			.Include(a => a.User)
+			.Include(x => x.User)
 			.FirstOrDefaultAsync(a => a.Id == command.ApplicationId, cancellationToken)
 			?? throw new NotFoundException("Application", command.ApplicationId);
 
 		var isFreelancer = application.UserId == userId;
-		var isCompany = application.Job!.Company!.UserId == userId;
+		var isCompany = application.Job?.Company?.UserId == userId;
 
 		if (!isFreelancer && !isCompany)
 			throw new ForbiddenException(
@@ -61,23 +61,18 @@ public class SendMessageCommandHandler
 		_db.Messages.Add(message);
 		await _db.SaveChangesAsync(cancellationToken);
 
-		var sender = await _db.Users
-			.AsNoTracking()
-			.FirstAsync(u => u.Id == userId, cancellationToken);
-
 		var messageDto = new MessageDto
 		{
 			Id = message.Id,
 			SenderId = message.SenderId,
-			SenderName = sender.FullName,
-			SenderRole = sender.Role.ToString(),
+			SenderName = application.User.FullName,
+			SenderRole = application.User.Role.ToString(),
 			Content = message.Content,
 			IsRead = message.IsRead,
 			SentAt = message.SentAt,
 			IsOwnMessage = true
 		};
 
-		// Push to all connected clients in this conversation instantly
 		await _chatNotification.SendMessageToConversation(
 			command.ApplicationId, messageDto);
 

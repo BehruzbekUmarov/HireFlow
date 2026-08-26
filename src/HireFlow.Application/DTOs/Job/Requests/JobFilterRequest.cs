@@ -1,4 +1,4 @@
-﻿namespace HireFlow.Application.DTOs.Job;
+﻿namespace HireFlow.Application.DTOs.Job.Requests;
 
 public class JobFilterRequest
 {

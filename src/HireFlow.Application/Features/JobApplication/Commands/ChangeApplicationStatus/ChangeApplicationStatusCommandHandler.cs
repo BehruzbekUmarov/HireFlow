@@ -1,5 +1,5 @@
 ﻿using HireFlow.Application.Common.Mappings;
-using HireFlow.Application.DTOs.JobApplication;
+using HireFlow.Application.DTOs.JobApplication.Responses;
 using HireFlow.Application.Events;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;

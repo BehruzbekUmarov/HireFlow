@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.DTOs.Job;
+﻿using HireFlow.Application.DTOs.Job.Responses;
 using MediatR;
 
 namespace HireFlow.Application.Features.Job.Queries.GetJobById;

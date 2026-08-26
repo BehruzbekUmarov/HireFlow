@@ -9,44 +9,61 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Common.Auth.Commands.RegisterCompany;
 
-public class RegisterCompanyCommandHandler : IRequestHandler<RegisterCompanyCommand, RegisterResponse>
+public sealed class RegisterCompanyCommandHandler
+	: IRequestHandler<RegisterCompanyCommand, RegisterResponse>
 {
 	private readonly IAppDbContext _db;
 	private readonly IPasswordHasher _passwordHasher;
 
-	public RegisterCompanyCommandHandler(IAppDbContext db, IPasswordHasher passwordHasher)
+	public RegisterCompanyCommandHandler(
+		IAppDbContext db,
+		IPasswordHasher passwordHasher)
 	{
 		_db = db;
 		_passwordHasher = passwordHasher;
 	}
 
-	public async Task<RegisterResponse> Handle(RegisterCompanyCommand command, CancellationToken cancellationToken)
+	public async Task<RegisterResponse> Handle(
+		RegisterCompanyCommand command,
+		CancellationToken cancellationToken)
 	{
 		var request = command.Request;
 
-		var emailTaken = await _db.Users
-			.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant(), cancellationToken);
-		if (emailTaken is not null)
-			throw new ConflictException("Email is already registered.");
+		var email = request.Email
+			.Trim()
+			.ToLowerInvariant();
 
-		var user = new HireFlow.Domain.Entities.User
+		var emailExists = await _db.Users
+			.AnyAsync(
+				u => u.Email == email,
+				cancellationToken);
+
+		if (emailExists)
 		{
-			Email = request.Email.Trim().ToLowerInvariant(),
+			throw new ConflictException(
+				"Email is already registered.");
+		}
+
+		var now = DateTime.UtcNow;
+
+		var user = new Domain.Entities.User
+		{
+			Email = email,
 			PasswordHash = _passwordHasher.Hash(request.Password),
 			FullName = request.FullName.Trim(),
 			Role = UserRole.Company,
-			CreatedAt = DateTime.UtcNow,
-			JobApplications = [],
-			RefreshTokens = [],
+			CreatedAt = now,
+
 			Company = new Company
 			{
 				Name = request.CompanyName.Trim(),
 				IsApproved = false,
-				CreatedAt = DateTime.UtcNow
+				CreatedAt = now
 			}
 		};
 
 		_db.Users.Add(user);
+
 		await _db.SaveChangesAsync(cancellationToken);
 
 		return new RegisterResponse
@@ -56,7 +73,8 @@ public class RegisterCompanyCommandHandler : IRequestHandler<RegisterCompanyComm
 			FullName = user.FullName,
 			Role = user.Role.ToString(),
 			CreatedAt = user.CreatedAt,
-			Message = "Company account created. Pending admin approval before posting jobs."
+			Message =
+				"Company account created. Pending admin approval before posting jobs."
 		};
 	}
 }

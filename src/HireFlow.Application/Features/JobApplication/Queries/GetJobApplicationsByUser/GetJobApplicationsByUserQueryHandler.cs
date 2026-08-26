@@ -1,6 +1,6 @@
 ﻿using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.DTOs.JobApplication;
+using HireFlow.Application.DTOs.JobApplication.Responses;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
@@ -24,7 +24,7 @@ public class GetJobApplicationsByUserQueryHandler : IRequestHandler<GetJobApplic
 	{
 		var userId = _currentUser.UserId;
 
-		if (userId is 0)
+		if (userId <= 0)
 			throw new ForbiddenException("You must be logged in to view your job applications.");
 
 		var query = _db.JobApplications

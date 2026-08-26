@@ -1,7 +1,8 @@
-﻿namespace HireFlow.Application.DTOs.User;
+﻿namespace HireFlow.Application.DTOs.User.Requests;
 
 public class UpdateFreelancerProfileRequest
 {
+	public string? FullName { get; set; }
 	public string? Bio { get; set; }
 	public string? Skills { get; set; }
 	public string? PhoneNumber { get; set; }

@@ -1,5 +1,6 @@
 ﻿using HireFlow.Api.Common.File;
-using HireFlow.Application.DTOs.User;
+using HireFlow.Application.DTOs.User.Requests;
+using HireFlow.Application.DTOs.User.Responses;
 using HireFlow.Application.Features.Common.User.Commands.UpdateCompanyLogo;
 using HireFlow.Application.Features.Common.User.Commands.UpdateCompanyProfile;
 using HireFlow.Application.Features.Common.User.Commands.UpdateFreelancerAvatar;

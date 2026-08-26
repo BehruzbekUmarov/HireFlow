@@ -1,4 +1,4 @@
-﻿namespace HireFlow.Application.DTOs.User;
+﻿namespace HireFlow.Application.DTOs.User.Responses;
 
 public class CompanyProfileDto
 {

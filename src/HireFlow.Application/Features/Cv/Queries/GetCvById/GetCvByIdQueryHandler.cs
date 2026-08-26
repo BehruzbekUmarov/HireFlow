@@ -1,5 +1,5 @@
 ﻿using HireFlow.Application.DTOs.Cv.Responses;
-using HireFlow.Application.Features.Cv.Commands.CreateCv;
+using HireFlow.Application.Features.Cv.Dtos;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
@@ -22,13 +22,16 @@ public class GetCvByIdQueryHandler : IRequestHandler<GetCvByIdQuery, CvDto>
 	public async Task<CvDto> Handle(
 		GetCvByIdQuery query, CancellationToken cancellationToken)
 	{
+		var userId = _currentUser.UserId;
+
 		var cv = await _db.FreelancerCvs
+			.AsNoTracking()
 			.FirstOrDefaultAsync(c => c.Id == query.CvId, cancellationToken)
 			?? throw new NotFoundException("CV", query.CvId);
 
-		if (cv.UserId != _currentUser.UserId)
+		if (cv.UserId != userId)
 			throw new ForbiddenException("You can only view your own CVs.");
 
-		return CreateCvCommandHandler.MapToDto(cv);
+		return CvMapper.MapToDto(cv);
 	}
 }

@@ -1,4 +1,4 @@
-﻿using HireFlow.Application.DTOs.JobApplication;
+﻿using HireFlow.Application.DTOs.JobApplication.Responses;
 using HireFlow.Domain.Enums;
 using MediatR;
 

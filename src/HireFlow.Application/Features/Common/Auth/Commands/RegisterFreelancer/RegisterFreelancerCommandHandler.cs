@@ -9,39 +9,54 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Common.Auth.Commands.RegisterFreelancer;
 
-public sealed class RegisterFreelancerCommandHandler : IRequestHandler<RegisterFreelancerCommand, RegisterResponse>
+public sealed class RegisterFreelancerCommandHandler
+	: IRequestHandler<RegisterFreelancerCommand, RegisterResponse>
 {
 	private readonly IAppDbContext _db;
 	private readonly IPasswordHasher _passwordHasher;
 
-	public RegisterFreelancerCommandHandler(IAppDbContext db, IPasswordHasher passwordHasher)
+	public RegisterFreelancerCommandHandler(
+		IAppDbContext db,
+		IPasswordHasher passwordHasher)
 	{
 		_db = db;
 		_passwordHasher = passwordHasher;
 	}
 
-	public async Task<RegisterResponse> Handle(RegisterFreelancerCommand command, CancellationToken cancellationToken)
+	public async Task<RegisterResponse> Handle(
+		RegisterFreelancerCommand command,
+		CancellationToken cancellationToken)
 	{
 		var request = command.Request;
 
-		var emailTaken = await _db.Users
-			.FirstOrDefaultAsync(u => u.Email == request.Email.ToLowerInvariant(), cancellationToken);
+		var email = request.Email
+			.Trim()
+			.ToLowerInvariant();
 
-		if (emailTaken is not null)
-			throw new ConflictException("Email is already registered.");
+		var emailExists = await _db.Users
+			.AnyAsync(
+				u => u.Email == email,
+				cancellationToken);
 
-		var user = new HireFlow.Domain.Entities.User
+		if (emailExists)
 		{
-			Email = request.Email.Trim().ToLowerInvariant(),
+			throw new ConflictException(
+				"Email is already registered.");
+		}
+
+		var now = DateTime.UtcNow;
+
+		var user = new Domain.Entities.User
+		{
+			Email = email,
 			PasswordHash = _passwordHasher.Hash(request.Password),
 			FullName = request.FullName.Trim(),
 			Role = UserRole.Freelancer,
-			CreatedAt = DateTime.UtcNow,
-			JobApplications = [],
-			RefreshTokens = []
+			CreatedAt = now
 		};
 
 		_db.Users.Add(user);
+
 		await _db.SaveChangesAsync(cancellationToken);
 
 		return new RegisterResponse

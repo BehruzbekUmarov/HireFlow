@@ -1,5 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Cv.Responses;
 using HireFlow.Application.Features.Cv.Commands.CreateCv;
+using HireFlow.Application.Features.Cv.Dtos;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Exceptions;
 using HireFlow.Domain.Interfaces;
@@ -59,6 +60,6 @@ public class UpdateCvCommandHandler : IRequestHandler<UpdateCvCommand, CvDto>
 
 		await _db.SaveChangesAsync(cancellationToken);
 
-		return CreateCvCommandHandler.MapToDto(cv);
+		return CvMapper.MapToDto(cv);
 	}
 }

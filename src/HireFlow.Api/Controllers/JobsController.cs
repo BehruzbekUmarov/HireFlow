@@ -1,5 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.DTOs.Job;
+using HireFlow.Application.DTOs.Job.Requests;
+using HireFlow.Application.DTOs.Job.Responses;
 using HireFlow.Application.Features.Job.Commands.CloseJob;
 using HireFlow.Application.Features.Job.Commands.CreateJob;
 using HireFlow.Application.Features.Job.Commands.DeleteJob;

@@ -1,6 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Cv.Responses;
 
-namespace HireFlow.Application.DTOs.JobApplication;
+namespace HireFlow.Application.DTOs.JobApplication.Responses;
 
 public class JobApplicationDto
 {

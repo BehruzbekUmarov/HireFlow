@@ -1,4 +1,5 @@
 ﻿using HireFlow.Application.DTOs.Cv.Responses;
+using HireFlow.Application.Features.Cv.Dtos;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
 using HireFlow.Domain.Interfaces;
@@ -46,7 +47,7 @@ public class CreateCvCommandHandler : IRequestHandler<CreateCvCommand, CvDto>
 		_db.FreelancerCvs.Add(cv);
 		await _db.SaveChangesAsync(cancellationToken);
 
-		return MapToDto(cv);
+		return CvMapper.MapToDto(cv);
 	}
 
 	private async Task RemoveExistingDefaultAsync(
@@ -59,22 +60,4 @@ public class CreateCvCommandHandler : IRequestHandler<CreateCvCommand, CvDto>
 		foreach (var c in existing)
 			c.IsDefault = false;
 	}
-
-	public static CvDto MapToDto(FreelancerCv cv) => new()
-	{
-		Id = cv.Id,
-		Title = cv.Title,
-		Summary = cv.Summary,
-		Skills = cv.Skills,
-		Experience = cv.Experience,
-		Projects = cv.Projects,
-		Education = cv.Education,
-		Languages = cv.Languages,
-		PortfolioUrl = cv.PortfolioUrl,
-		YearsOfExperience = cv.YearsOfExperience,
-		FileUrl = cv.FileUrl,
-		IsDefault = cv.IsDefault,
-		CreatedAt = cv.CreatedAt,
-		UpdatedAt = cv.UpdatedAt
-	};
 }

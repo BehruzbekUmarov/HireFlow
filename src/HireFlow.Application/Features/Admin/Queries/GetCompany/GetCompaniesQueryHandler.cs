@@ -20,8 +20,7 @@ public sealed class GetCompaniesQueryHandler : IRequestHandler<GetCompaniesQuery
 
 		var total = await query.CountAsync(cancellationToken);
 
-		var items = await _db.Companies
-			.AsNoTracking() 
+		var items = await query 
 			.OrderByDescending(c => c.CreatedAt)
 			.Skip((request.PageNumber - 1) * request.PageSize)
 			.Take(request.PageSize)

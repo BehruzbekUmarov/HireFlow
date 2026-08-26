@@ -1,6 +1,6 @@
 ﻿using HireFlow.Application.Common.Constants;
 using HireFlow.Application.DTOs.Common;
-using HireFlow.Application.DTOs.Job;
+using HireFlow.Application.DTOs.Job.Responses;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Interfaces;
 using MediatR;

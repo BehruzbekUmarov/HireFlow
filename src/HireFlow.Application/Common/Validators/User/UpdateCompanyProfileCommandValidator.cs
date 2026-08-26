@@ -21,7 +21,7 @@ public class UpdateCompanyProfileCommandValidator
 			.MaximumLength(500).WithMessage("Website must not exceed 500 characters.")
 			.Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
 			.WithMessage("Website must be a valid URL.")
-			.When(x => x.Request.Website is not null);
+			.When(x => x.Request.Website is not null);	
 
 		RuleFor(x => x.Request.Location)
 			.MaximumLength(200).WithMessage("Location must not exceed 200 characters.")

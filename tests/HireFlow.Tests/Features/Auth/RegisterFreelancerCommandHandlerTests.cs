@@ -16,8 +16,6 @@ public class RegisterFreelancerCommandHandlerTests : TestBase
 	private readonly Mock<IPasswordHasher> _passwordHasherMock;
 	private readonly RegisterFreelancerCommandHandler _handler;
 
-	// ? removed _tokenServiceMock — register doesn't use tokens
-
 	public RegisterFreelancerCommandHandlerTests()
 	{
 		_db = TestDbContextFactory.Create();
@@ -26,8 +24,6 @@ public class RegisterFreelancerCommandHandlerTests : TestBase
 		_passwordHasherMock
 			.Setup(h => h.Hash(It.IsAny<string>()))
 			.Returns("hashed_password");
-
-		// ? removed all _tokenServiceMock setup — not needed here
 
 		_handler = new RegisterFreelancerCommandHandler(
 			_db,

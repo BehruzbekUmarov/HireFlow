@@ -7,8 +7,8 @@ public static class FileValidator
 	private static readonly string[] AllowedCvExtensions = [".pdf", ".doc", ".docx"];
 	private static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".webp"];
 
-	private const long MaxCvSize = 5 * 1024 * 1024;        // 5 MB
-	private const long MaxImageSize = 2 * 1024 * 1024;     // 2 MB
+	private const long MaxCvSize = 7 * 1024 * 1024;        
+	private const long MaxImageSize = 2 * 1024 * 1024;    
 
 	public static void ValidateCv(IFormFile file)
 	{
@@ -17,7 +17,7 @@ public static class FileValidator
 
 		if (file.Length > MaxCvSize)
 			throw new InvalidOperationDomainException(
-				"CV file must not exceed 5MB.");
+				"CV file must not exceed 7MB.");
 
 		var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
 		if (!AllowedCvExtensions.Contains(extension))

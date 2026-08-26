@@ -59,7 +59,6 @@ public class CvDocument : IDocument
 
 	private void ComposeSidebar(ColumnDescriptor col)
 	{
-		// Initials avatar
 		col.Item().AlignCenter()
 		   .Width(70).Height(70)
 		   .Background("#4A6FA5")
@@ -81,7 +80,6 @@ public class CvDocument : IDocument
 
 		col.Item().Height(20);
 
-		// Contact
 		SidebarSection(col, "CONTACT");
 		SidebarItem(col, _email);
 		SidebarItem(col, "Tashkent, Uzbekistan");
@@ -89,7 +87,6 @@ public class CvDocument : IDocument
 		if (_portfolioUrl is not null) SidebarItem(col, _portfolioUrl);
 		col.Item().Height(12);
 
-		// Skills
 		if (_cv.Skills is not null)
 		{
 			SidebarSection(col, "SKILLS");
@@ -102,7 +99,6 @@ public class CvDocument : IDocument
 			col.Item().Height(8);
 		}
 
-		// Languages
 		if (_cv.Languages is not null)
 		{
 			SidebarSection(col, "LANGUAGES");
@@ -115,7 +111,6 @@ public class CvDocument : IDocument
 			col.Item().Height(8);
 		}
 
-		// Years of experience
 		if (_cv.YearsOfExperience.HasValue)
 		{
 			SidebarSection(col, "EXPERIENCE");
@@ -127,21 +122,18 @@ public class CvDocument : IDocument
 
 	private void ComposeMain(ColumnDescriptor col)
 	{
-		// Name
 		col.Item()
 		   .Text(_fullName)
 		   .FontSize(20).Bold().FontColor(PrimaryColor);
 
 		col.Item().Height(2);
 
-		// Title with bottom border
 		col.Item().PaddingBottom(10).BorderBottom(2).BorderColor(PrimaryColor)
 		   .Text(_cv.Title)
 		   .FontSize(11).Bold().FontColor(AccentColor);
 
 		col.Item().Height(14);
 
-		// Summary
 		if (_cv.Summary is not null)
 		{
 			MainSection(col, "PROFILE");
@@ -154,7 +146,6 @@ public class CvDocument : IDocument
 			col.Item().Height(14);
 		}
 
-		// Experience
 		if (_cv.Experience is not null)
 		{
 			MainSection(col, "EXPERIENCE");
@@ -164,7 +155,6 @@ public class CvDocument : IDocument
 			col.Item().Height(14);
 		}
 
-		// Education
 		if (_cv.Education is not null)
 		{
 			MainSection(col, "EDUCATION");
@@ -174,7 +164,6 @@ public class CvDocument : IDocument
 			col.Item().Height(14);
 		}
 
-		// Projects section
 		if (_cv.Projects is not null)
 		{
 			MainSection(col, "PROJECTS");
@@ -184,7 +173,6 @@ public class CvDocument : IDocument
 			col.Item().Height(14);
 		}
 
-		// Skills as tags — fixed: no Wrap(), use Column of Rows
 		if (_cv.Skills is not null)
 		{
 			MainSection(col, "TECHNOLOGIES");
@@ -223,7 +211,6 @@ public class CvDocument : IDocument
 
 	private static void SidebarSection(ColumnDescriptor col, string title)
 	{
-		// Fixed: removed .Opacity() — not supported
 		col.Item().PaddingBottom(5)
 		   .BorderBottom(1).BorderColor("#4A6FA5")
 		   .Text(title)

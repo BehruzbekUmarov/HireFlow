@@ -22,7 +22,6 @@ public class ResendEmailService : IEmailService
 		_httpClient.DefaultRequestHeaders.Authorization =
 			new AuthenticationHeaderValue("Bearer", configuration["Resend:ApiKey"]);
 
-		// Use your own verified domain once set up; onboarding@resend.dev works without verification for testing
 		_fromAddress = configuration["Resend:From"] ?? "onboarding@resend.dev";
 	}
 

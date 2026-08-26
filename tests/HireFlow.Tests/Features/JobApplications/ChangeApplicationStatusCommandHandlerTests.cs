@@ -20,9 +20,8 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 	public ChangeApplicationStatusCommandHandlerTests()
 	{
 		_db = TestDbContextFactory.Create();
-		_publishEndpointMock = new Mock<IPublishEndpoint>(); // ← add this
+		_publishEndpointMock = new Mock<IPublishEndpoint>(); 
 
-		// Setup — Publish does nothing in tests (we don't want real RabbitMQ)
 		_publishEndpointMock
 			.Setup(p => p.Publish(
 				It.IsAny<ApplicationStatusChangedEvent>(),
@@ -32,7 +31,7 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 		_handler = new ChangeApplicationStatusCommandHandler(
 			_db,
 			CurrentUserMock.Object,
-			_publishEndpointMock.Object); // ← add this
+			_publishEndpointMock.Object); 
 	}
 
 	private async Task<(Company company, Job job, JobApplication application)>
@@ -91,16 +90,13 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 	[Fact]
 	public async Task Handle_PendingToReviewed_ChangesStatus()
 	{
-		// Arrange
 		var (company, _, application) = await SeedDataAsync();
 		SetCurrentUser(userId: 1, companyId: company.Id);
 
-		// Act
 		await _handler.Handle(
 			new ChangeApplicationStatusCommand(application.Id, ApplicationStatus.Reviewed),
 			CancellationToken.None);
 
-		// Assert
 		var updated = await _db.JobApplications.FindAsync(application.Id);
 		updated!.Status.Should().Be(ApplicationStatus.Reviewed);
 	}
@@ -108,15 +104,12 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 	[Fact]
 	public async Task Handle_AcceptedToPending_ThrowsInvalidOperation()
 	{
-		// Arrange
 		var (company, _, application) = await SeedDataAsync();
 		SetCurrentUser(userId: 1, companyId: company.Id);
 
-		// Move to Accepted first
 		application.Status = ApplicationStatus.Accepted;
 		await _db.SaveChangesAsync();
 
-		// Act & Assert — can't go back to Pending from Accepted
 		var act = async () => await _handler.Handle(
 			new ChangeApplicationStatusCommand(application.Id, ApplicationStatus.Pending),
 			CancellationToken.None);
@@ -127,13 +120,10 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 	[Fact]
 	public async Task Handle_WrongCompany_ThrowsForbiddenException()
 	{
-		// Arrange
 		var (_, _, application) = await SeedDataAsync();
 
-		// Different company trying to change status
 		SetCurrentUser(userId: 99, companyId: 99);
 
-		// Act & Assert
 		var act = async () => await _handler.Handle(
 			new ChangeApplicationStatusCommand(application.Id, ApplicationStatus.Reviewed),
 			CancellationToken.None);
@@ -144,16 +134,13 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 	[Fact]
 	public async Task Handle_StatusChange_AddsToHistory()
 	{
-		// Arrange
 		var (company, _, application) = await SeedDataAsync();
 		SetCurrentUser(userId: 1, companyId: company.Id);
 
-		// Act
 		await _handler.Handle(
 			new ChangeApplicationStatusCommand(application.Id, ApplicationStatus.Reviewed),
 			CancellationToken.None);
 
-		// Assert — history should be recorded
 		var history = _db.ApplicationStatusHistories
 			.Where(h => h.ApplicationId == application.Id)
 			.ToList();

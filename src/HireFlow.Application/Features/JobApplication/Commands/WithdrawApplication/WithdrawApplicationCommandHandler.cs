@@ -28,12 +28,10 @@ public class WithdrawApplicationCommandHandler
 				a => a.Id == command.ApplicationId, cancellationToken)
 			?? throw new NotFoundException("Application", command.ApplicationId);
 
-		// Only the owner can withdraw
 		if (application.UserId != _currentUser.UserId)
 			throw new ForbiddenException(
 				"You can only withdraw your own applications.");
 
-		// Can only withdraw if still pending or reviewed
 		if (application.Status is ApplicationStatus.Accepted
 			or ApplicationStatus.Rejected
 			or ApplicationStatus.Withdrawn)

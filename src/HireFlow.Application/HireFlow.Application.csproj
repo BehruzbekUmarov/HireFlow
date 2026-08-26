@@ -1,12 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Features\Admin\Factories\**" />
+    <Compile Remove="Features\Admin\Services\**" />
     <Compile Remove="Features\Common\Dtos\**" />
     <Compile Remove="Features\Common\Queries\**" />
+    <Compile Remove="Services\Implementations\**" />
+    <EmbeddedResource Remove="Features\Admin\Factories\**" />
+    <EmbeddedResource Remove="Features\Admin\Services\**" />
     <EmbeddedResource Remove="Features\Common\Dtos\**" />
     <EmbeddedResource Remove="Features\Common\Queries\**" />
+    <EmbeddedResource Remove="Services\Implementations\**" />
+    <None Remove="Features\Admin\Factories\**" />
+    <None Remove="Features\Admin\Services\**" />
     <None Remove="Features\Common\Dtos\**" />
     <None Remove="Features\Common\Queries\**" />
+    <None Remove="Services\Implementations\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,13 +30,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.15" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.9" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Admin\Factories\" />
-    <Folder Include="Features\Admin\Services\Implementations\" />
-    <Folder Include="Features\Admin\Services\Interfaces\" />
-    <Folder Include="Services\Implementations\" />
   </ItemGroup>
 
   <PropertyGroup>

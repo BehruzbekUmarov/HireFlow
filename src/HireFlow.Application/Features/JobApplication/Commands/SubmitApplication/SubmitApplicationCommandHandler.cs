@@ -41,12 +41,10 @@ public sealed class SubmitApplicationCommandHandler
 		if (hasAlreadyApplied)
 			throw new ConflictException("You have already applied to this job.");
 
-		// Resolve which CV to use
 		long? cvId = null;
 
 		if (command.Request.CvId.HasValue)
 		{
-			// Freelancer picked a specific CV — verify it belongs to them
 			var cv = await _db.FreelancerCvs
 				.FirstOrDefaultAsync(c => c.Id == command.Request.CvId
 									   && c.UserId == userId, cancellationToken)
@@ -56,12 +54,11 @@ public sealed class SubmitApplicationCommandHandler
 		}
 		else
 		{
-			// No CV picked — use default CV if exists
 			var defaultCv = await _db.FreelancerCvs
 				.FirstOrDefaultAsync(c => c.UserId == userId
 									   && c.IsDefault, cancellationToken);
 
-			cvId = defaultCv?.Id; // null if no default set — that's fine
+			cvId = defaultCv?.Id; 
 		}
 
 		var application = new JobApplication
@@ -69,7 +66,7 @@ public sealed class SubmitApplicationCommandHandler
 			JobId = command.JobId,
 			UserId = userId,
 			CoverLetter = command.Request.CoverLetter.Trim(),
-			CvId = cvId,      // ← reference to FreelancerCv
+			CvId = cvId,    
 			Status = ApplicationStatus.Pending,
 			CreatedAt = DateTime.UtcNow
 		};

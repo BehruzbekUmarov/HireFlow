@@ -29,7 +29,10 @@ public sealed class ForgotPasswordCommandHandler
 	public async Task<ForgotPasswordResponse> Handle(
 		ForgotPasswordCommand command, CancellationToken cancellationToken)
 	{
-		var email = command.Request.Email.ToLowerInvariant();
+		var email = command.Request.Email
+			.Trim()
+			.ToLowerInvariant();
+
 		var user = await _db.Users
 			.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 

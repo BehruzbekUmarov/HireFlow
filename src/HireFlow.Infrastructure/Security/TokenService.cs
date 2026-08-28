@@ -20,23 +20,25 @@ public sealed class TokenService : ITokenService
 		_options = options.Value;
 	}
 
-	public AccessTokenResult GenerateAccessToken(User user)
+	public AccessTokenResult GenerateAccessToken(
+	User user,
+	long? companyId)
 	{
 		var now = DateTime.UtcNow;
 		var expiresAt = now.AddMinutes(_options.AccessTokenMinutes);
 
 		var claims = new List<Claim>
-		{
-			new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-			new(ClaimTypes.Email, user.Email),
-			new(ClaimTypes.Role, user.Role.ToString()),
-			new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-		};
+	{
+		new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+		new(ClaimTypes.Email, user.Email),
+		new(ClaimTypes.Role, user.Role.ToString()),
+		new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+	};
 
-		if (user.Company is not null)
+		if (companyId.HasValue)
 		{
 			claims.Add(
-				new Claim("CompanyId", user.Company.Id.ToString()));
+				new Claim("CompanyId", companyId.Value.ToString()));
 		}
 
 		var key = new SymmetricSecurityKey(

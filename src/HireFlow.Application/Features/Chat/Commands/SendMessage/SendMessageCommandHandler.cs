@@ -49,6 +49,10 @@ public class SendMessageCommandHandler
 			throw new InvalidOperationDomainException(
 				"Cannot send messages on a withdrawn application.");
 
+		var sender = await _db.Users
+			.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken)
+			?? throw new NotFoundException("User", userId);
+
 		var message = new Message
 		{
 			ApplicationId = command.ApplicationId,
@@ -65,8 +69,8 @@ public class SendMessageCommandHandler
 		{
 			Id = message.Id,
 			SenderId = message.SenderId,
-			SenderName = application.User.FullName,
-			SenderRole = application.User.Role.ToString(),
+			SenderName = sender.FullName,
+			SenderRole = sender.Role.ToString(),
 			Content = message.Content,
 			IsRead = message.IsRead,
 			SentAt = message.SentAt,

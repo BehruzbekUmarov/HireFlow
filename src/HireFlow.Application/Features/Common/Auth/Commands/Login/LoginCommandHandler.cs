@@ -1,6 +1,7 @@
 ﻿using HireFlow.Application.DTOs.Auth.Responses;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
+using HireFlow.Domain.Enums;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -25,10 +26,12 @@ public sealed class LoginCommandHandler
 	}
 
 	public async Task<LoginResponse?> Handle(
-		LoginCommand command,
-		CancellationToken cancellationToken)
+	LoginCommand command,
+	CancellationToken cancellationToken)
 	{
-		var email = command.Request.Email.ToLowerInvariant();
+		var email = command.Request.Email
+			.Trim()
+			.ToLowerInvariant();
 
 		var user = await _db.Users
 			.FirstOrDefaultAsync(
@@ -43,17 +46,32 @@ public sealed class LoginCommandHandler
 			return null;
 		}
 
-		var accessToken = _tokenService.GenerateAccessToken(user);
-		var refreshToken = _tokenService.GenerateRefreshToken();
+		long? companyId = null;
 
-		_db.RefreshTokens.Add(new HireFlow.Domain.Entities.RefreshToken
+		if (user.Role == UserRole.Company)
 		{
-			UserId = user.Id,
-			TokenHash = _tokenService.HashToken(refreshToken.Token),
-			ExpiresAt = refreshToken.ExpiresAt,
-			Revoked = false,
-			CreatedAt = DateTime.UtcNow
-		});
+			companyId = await _db.Companies
+				.Where(c => c.UserId == user.Id)
+				.Select(c => (long?)c.Id)
+				.FirstOrDefaultAsync(cancellationToken);
+		}
+
+		var accessToken =
+			_tokenService.GenerateAccessToken(user, companyId);
+
+		var refreshToken =
+			_tokenService.GenerateRefreshToken();
+
+		_db.RefreshTokens.Add(
+			new Domain.Entities.RefreshToken
+			{
+				UserId = user.Id,
+				TokenHash =
+					_tokenService.HashToken(refreshToken.Token),
+				ExpiresAt = refreshToken.ExpiresAt,
+				Revoked = false,
+				CreatedAt = DateTime.UtcNow
+			});
 
 		await _db.SaveChangesAsync(cancellationToken);
 

@@ -27,7 +27,7 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
 		builder.HasOne(m => m.Sender)
 			   .WithMany(u => u.SentMessages)
 			   .HasForeignKey(m => m.SenderId)
-			   .OnDelete(DeleteBehavior.NoAction);
+			   .OnDelete(DeleteBehavior.SetNull);
 
 		builder.HasIndex(m => m.ApplicationId);
 		builder.HasIndex(m => new { m.ApplicationId, m.SentAt });

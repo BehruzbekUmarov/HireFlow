@@ -1,5 +1,6 @@
 ﻿using HireFlow.Application.DTOs.Auth.Responses;
 using HireFlow.Application.Services.Interfaces;
+using HireFlow.Domain.Enums;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +29,6 @@ public sealed class RefreshTokenCommandHandler
 
 		var stored = await _db.RefreshTokens
 			.Include(t => t.User)
-				.ThenInclude(u => u!.Company)
 			.FirstOrDefaultAsync(
 				t => t.TokenHash == tokenHash,
 				cancellationToken);
@@ -37,27 +37,41 @@ public sealed class RefreshTokenCommandHandler
 
 		if (stored is null ||
 			stored.Revoked ||
-			stored.ExpiresAt <= now)
+			stored.ExpiresAt <= now ||
+			stored.User is null)
 		{
 			return null;
 		}
 
 		stored.Revoked = true;
 
-		var accessToken = _tokenService
-			.GenerateAccessToken(stored.User!);
+		long? companyId = null;
+
+		if (stored.User.Role == UserRole.Company)
+		{
+			companyId = await _db.Companies
+				.Where(c => c.UserId == stored.User.Id)
+				.Select(c => (long?)c.Id)
+				.FirstOrDefaultAsync(cancellationToken);
+		}
+
+		var accessToken = _tokenService.GenerateAccessToken(
+			stored.User,
+			companyId);
 
 		var refreshToken = _tokenService
 			.GenerateRefreshToken();
 
-		_db.RefreshTokens.Add(new Domain.Entities.RefreshToken
-		{
-			UserId = stored.User!.Id,
-			TokenHash = _tokenService.HashToken(refreshToken.Token),
-			ExpiresAt = refreshToken.ExpiresAt,
-			Revoked = false,
-			CreatedAt = now
-		});
+		_db.RefreshTokens.Add(
+			new Domain.Entities.RefreshToken
+			{
+				UserId = stored.User.Id,
+				TokenHash =
+					_tokenService.HashToken(refreshToken.Token),
+				ExpiresAt = refreshToken.ExpiresAt,
+				Revoked = false,
+				CreatedAt = now
+			});
 
 		await _db.SaveChangesAsync(cancellationToken);
 

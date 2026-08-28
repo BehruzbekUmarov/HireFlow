@@ -76,11 +76,5 @@ public class JobsController : ControllerBase
 		return Ok(result);
 	}
 
-	[HttpDelete("jobs/{id}")]
-	[Authorize(Roles = "Admin")]
-	public async Task<IActionResult> DeleteJob(long id)
-	{
-		await _mediator.Send(new AdminDeleteJobCommand(id));
-		return NoContent();
-	}
+	
 }

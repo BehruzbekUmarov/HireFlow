@@ -36,13 +36,19 @@ public sealed class ResetPasswordCommandHandler
 				"Passwords do not match.");
 		}
 
+		var email = request.Email
+			.Trim()
+			.ToLowerInvariant();
+
 		var tokenHash = _tokenService.HashToken(request.Code);
 		var now = DateTime.UtcNow;
 
 		var resetToken = await _db.PasswordResetTokens
 			.Include(t => t.User)
 			.FirstOrDefaultAsync(
-				t => t.TokenHash == tokenHash,
+				t => 
+					t.User!.Email == email &&
+					t.TokenHash == tokenHash,
 				cancellationToken);
 
 		if (resetToken is null ||

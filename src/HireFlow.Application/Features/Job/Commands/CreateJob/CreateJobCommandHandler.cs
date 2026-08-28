@@ -2,15 +2,16 @@
 using HireFlow.Application.Common.Mappings;
 using HireFlow.Application.DTOs.Job.Responses;
 using HireFlow.Application.Services.Interfaces;
+using HireFlow.Domain.Common;
 using HireFlow.Domain.Entities;
-using HireFlow.Domain.Exceptions;
+using HireFlow.Domain.Errors;
 using HireFlow.Domain.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace HireFlow.Application.Features.Job.Commands.CreateJob;
 
-public sealed class CreateJobCommandHandler : IRequestHandler<CreateJobCommand, JobDetailDto>
+public sealed class CreateJobCommandHandler : IRequestHandler<CreateJobCommand, Result<JobDetailDto>>
 {
 	private readonly IAppDbContext _db;
 	private readonly ICurrentUser _currentUser;
@@ -26,28 +27,25 @@ public sealed class CreateJobCommandHandler : IRequestHandler<CreateJobCommand, 
 		_cache = cache;
 	}
 
-	public async Task<JobDetailDto> Handle(CreateJobCommand command, CancellationToken cancellationToken)
+	public async Task<Result<JobDetailDto>> Handle(CreateJobCommand command, CancellationToken cancellationToken)
 	{
-		long companyId = _currentUser.CompanyId
-		?? throw new ForbiddenException("You must be associated with a company to post a job.");
+		if (_currentUser.CompanyId is not { } companyId)
+			return Result.Failure<JobDetailDto>(DomainErrors.Company.NotAssociated);
 
-		var company = await _db.Companies.FindAsync(companyId, cancellationToken)
-			?? throw new NotFoundException($"Company not found {companyId}");
+		var company = await _db.Companies.FindAsync(companyId, cancellationToken);
+		if (company is null)
+			return Result.Failure<JobDetailDto>(DomainErrors.Company.NotFound(companyId));
 
 		if (!company.IsApproved)
-			throw new InvalidOperationException("Your company must be approved before posting jobs.");
+			return Result.Failure<JobDetailDto>(DomainErrors.Company.NotApproved);
 
-		var job = new Domain.Entities.Job
-		{
-			CompanyId = companyId,
-			Title = command.Request.Title.Trim(),
-			Description = command.Request.Description.Trim(),
-			Category = command.Request.Category.Trim(),
-			Location = command.Request.Location.Trim(),
-			Salary = command.Request.Salary,
-			IsActive = true,
-			CreatedAt = DateTime.UtcNow
-		};
+		var job = Domain.Entities.Job.Create(
+			company,
+			command.Request.Title,
+			command.Request.Description,
+			command.Request.Category,
+			command.Request.Location,
+			command.Request.Salary);
 
 		_db.Jobs.Add(job);
 		await _db.SaveChangesAsync(cancellationToken);

@@ -4,7 +4,7 @@ using HireFlow.Application.DTOs.Job.Requests;
 using HireFlow.Application.Features.Job.Commands.CreateJob;
 using HireFlow.Application.Services.Interfaces;
 using HireFlow.Domain.Entities;
-using HireFlow.Domain.Exceptions;
+using HireFlow.Domain.Errors;
 using HireFlow.Infrastructure.Persistence;
 using HireFlow.Tests.Common;
 using Moq;
@@ -22,7 +22,7 @@ public class CreateJobCommandHandlerTests : TestBase
 		_db = TestDbContextFactory.Create();
 		_cacheMock = new Mock<ICacheService>();
 
-		// Cache does nothing in tests — no Redis needed
+		// Cache does nothing in tests ï¿½ no Redis needed
 		_cacheMock
 			.Setup(c => c.RemoveByPrefixAsync(It.IsAny<string>()))
 			.Returns(Task.CompletedTask);
@@ -76,9 +76,9 @@ public class CreateJobCommandHandlerTests : TestBase
 			new CreateJobCommand(request),
 			CancellationToken.None);
 
-		result.Should().NotBeNull();
-		result.Title.Should().Be(".NET Developer");
-		result.Salary.Should().Be(2000);
+		result.IsSuccess.Should().BeTrue();
+		result.Value.Title.Should().Be(".NET Developer");
+		result.Value.Salary.Should().Be(2000);
 
 		var savedJob = _db.Jobs.FirstOrDefault();
 		savedJob.Should().NotBeNull();
@@ -88,7 +88,7 @@ public class CreateJobCommandHandlerTests : TestBase
 	[Fact]
 	public async Task Handle_ApprovedCompany_InvalidatesCacheAfterCreate()
 	{
-		// Bonus test — verify cache is cleared after job created
+		// Bonus test ï¿½ verify cache is cleared after job created
 		var (_, company) = await SeedApprovedCompanyAsync();
 		SetCurrentUser(userId: 1, companyId: company.Id);
 
@@ -112,7 +112,7 @@ public class CreateJobCommandHandlerTests : TestBase
 	}
 
 	[Fact]
-	public async Task Handle_UnapprovedCompany_ThrowsInvalidOperationException()
+	public async Task Handle_UnapprovedCompany_ReturnsCompanyNotApprovedError()
 	{
 		var user = new User
 		{
@@ -144,16 +144,16 @@ public class CreateJobCommandHandlerTests : TestBase
 			Salary = 2000
 		};
 
-		var act = async () => await _handler.Handle(
+		var result = await _handler.Handle(
 			new CreateJobCommand(request),
 			CancellationToken.None);
 
-		await act.Should().ThrowAsync<InvalidOperationException>()
-			.WithMessage("*approved*");
+		result.IsFailure.Should().BeTrue();
+		result.Error.Should().Be(DomainErrors.Company.NotApproved);
 	}
 
 	[Fact]
-	public async Task Handle_NoCompanyId_ThrowsForbiddenException()
+	public async Task Handle_NoCompanyId_ReturnsCompanyNotAssociatedError()
 	{
 		SetCurrentUser(userId: 1, companyId: null);
 
@@ -166,10 +166,11 @@ public class CreateJobCommandHandlerTests : TestBase
 			Salary = 2000
 		};
 
-		var act = async () => await _handler.Handle(
+		var result = await _handler.Handle(
 			new CreateJobCommand(request),
 			CancellationToken.None);
 
-		await act.Should().ThrowAsync<ForbiddenException>();
+		result.IsFailure.Should().BeTrue();
+		result.Error.Should().Be(DomainErrors.Company.NotAssociated);
 	}
 }

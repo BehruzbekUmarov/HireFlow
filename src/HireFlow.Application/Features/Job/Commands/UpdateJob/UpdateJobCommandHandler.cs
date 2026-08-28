@@ -33,12 +33,12 @@ public class UpdateJobCommandHandler : IRequestHandler<UpdateJobCommand, JobDeta
 		if (job.CompanyId != companyId)
 			throw new ForbiddenException("You can only edit your own job listings.");
 
-		job.Title = command.Request.Title.Trim();
-		job.Description = command.Request.Description.Trim();
-		job.Category = command.Request.Category.Trim();
-		job.Location = command.Request.Location.Trim();
-		job.Salary = command.Request.Salary;
-		job.UpdatedAt = DateTime.UtcNow;
+		job.UpdateDetails(
+			command.Request.Title,
+			command.Request.Description,
+			command.Request.Category,
+			command.Request.Location,
+			command.Request.Salary);
 
 		await _db.SaveChangesAsync(cancellationToken);
 

@@ -60,16 +60,13 @@ public class ChangeApplicationStatusCommandHandlerTests : TestBase
 			FullName = "Freelancer"
 		};
 
-		var job = new Job
-		{
-			Title = ".NET Developer",
-			Description = "Description",
-			Category = "Backend",
-			Location = "Tashkent",
-			Salary = 2000,
-			IsActive = true,
-			Company = company
-		};
+		var job = Job.Create(
+			company,
+			".NET Developer",
+			"Description",
+			"Backend",
+			"Tashkent",
+			2000);
 
 		var application = new JobApplication
 		{

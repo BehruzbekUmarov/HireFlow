@@ -19,9 +19,7 @@ public class AdminDeleteJobCommandHandler
 			.FirstOrDefaultAsync(j => j.Id == command.JobId, cancellationToken)
 			?? throw new NotFoundException("Job", command.JobId);
 
-		job.IsDeleted = true;
-		job.DeletedAt = DateTime.UtcNow;
-		job.IsActive = false;
+		job.Delete();
 
 		await _db.SaveChangesAsync(cancellationToken);
 	}

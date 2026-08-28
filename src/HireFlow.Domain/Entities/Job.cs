@@ -1,36 +1,78 @@
-﻿namespace HireFlow.Domain.Entities;
+using HireFlow.Domain.Primitives;
 
-public class Job
+namespace HireFlow.Domain.Entities;
+
+public sealed class Job : AggregateRoot
 {
-	public long Id { get; set; } 
-	public long CompanyId { get; set; }
+	public long CompanyId { get; private set; }
 
-	public string Title { get; set; } 
-	public string Description { get; set; }
-	public string Category { get; set; }
-	public string Location { get; set; } 
-	public decimal Salary { get; set; }
-	public bool IsActive { get; set; }
-	public bool IsDeleted { get; set; }      
-	public DateTime? ExpiresAt { get; set; }
+	public string Title { get; private set; } = string.Empty;
+	public string Description { get; private set; } = string.Empty;
+	public string Category { get; private set; } = string.Empty;
+	public string Location { get; private set; } = string.Empty;
+	public decimal Salary { get; private set; }
+	public bool IsActive { get; private set; } = true;
+	public bool IsDeleted { get; private set; }
+	public DateTime? ExpiresAt { get; private set; }
 
-	public DateTime CreatedAt { get; set; }
-	public DateTime? UpdatedAt { get; set; }
-	public DateTime? DeletedAt { get; set; }
+	public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+	public DateTime? UpdatedAt { get; private set; }
+	public DateTime? DeletedAt { get; private set; }
 
-	public Company? Company { get; set; } 
-	public List<JobApplication> JobApplications { get; set; }
+	public Company? Company { get; set; }
+	public List<JobApplication> JobApplications { get; set; } = [];
 
-	public Job()
+	private Job()
 	{
-		Title = string.Empty;
-		Description = string.Empty;
-		Category = string.Empty;
-		Location = string.Empty;
-		Salary = 0;
-		IsActive = true;
-		IsDeleted = false;
-		CreatedAt = DateTime.UtcNow;
-		JobApplications = [];
+	}
+
+	public static Job Create(
+		Company company,
+		string title,
+		string description,
+		string category,
+		string location,
+		decimal salary)
+	{
+		return new Job
+		{
+			Company = company,
+			CompanyId = company.Id,
+			Title = title.Trim(),
+			Description = description.Trim(),
+			Category = category.Trim(),
+			Location = location.Trim(),
+			Salary = salary,
+			IsActive = true,
+			CreatedAt = DateTime.UtcNow
+		};
+	}
+
+	public void UpdateDetails(
+		string title,
+		string description,
+		string category,
+		string location,
+		decimal salary)
+	{
+		Title = title.Trim();
+		Description = description.Trim();
+		Category = category.Trim();
+		Location = location.Trim();
+		Salary = salary;
+		UpdatedAt = DateTime.UtcNow;
+	}
+
+	public void Close()
+	{
+		IsActive = false;
+		UpdatedAt = DateTime.UtcNow;
+	}
+
+	public void Delete()
+	{
+		IsDeleted = true;
+		IsActive = false;
+		DeletedAt = DateTime.UtcNow;
 	}
 }

@@ -30,8 +30,7 @@ public class CloseJobCommandHandler : IRequestHandler<CloseJobCommand>
 		if (job.CompanyId != companyId)
 			throw new ForbiddenException("You can only close your own job listings.");
 
-		job.IsActive = false;
-		job.UpdatedAt = DateTime.UtcNow;
+		job.Close();
 
 		await _db.SaveChangesAsync(cancellationToken);
 

@@ -18,8 +18,8 @@ public class TestAppDbContext : DbContext, IAppDbContext
 	public DbSet<JobApplication> JobApplications { get; set; } = null!;
 	public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; } = null!;
 	public DbSet<FreelancerCv> FreelancerCvs { get; set; } = null!;
-
 	public DbSet<Message> Messages { get; set; } = null!;
+	public DbSet<TalentCard> TalentCards { get; set; } = null!;
 	public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 	public DbSet<PasswordResetToken> PasswordResetTokens { get; set; } = null!;
 }

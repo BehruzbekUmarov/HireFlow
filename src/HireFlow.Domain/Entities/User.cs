@@ -27,6 +27,7 @@ public class User
 	public List<Message> SentMessages { get; set; } 
 	public List<RefreshToken> RefreshTokens { get; set; }
 	public List<PasswordResetToken> PasswordResetTokens { get; set; }
+	public List<TalentCard> TalentCards { get; set; }
 
 	public User() 
 	{
@@ -40,5 +41,6 @@ public class User
 		SentMessages = [];	
 		RefreshTokens = [];
 		PasswordResetTokens = [];
+		TalentCards = [];
 	} 
 }

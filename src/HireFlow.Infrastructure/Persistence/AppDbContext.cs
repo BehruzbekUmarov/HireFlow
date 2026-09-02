@@ -16,6 +16,7 @@ public class AppDbContext : DbContext, IAppDbContext
 	public DbSet<FreelancerCv> FreelancerCvs { get; set; }
 	public DbSet<Message> Messages { get; set; }
 	public DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; set; }
+	public DbSet<TalentCard> TalentCards { get; set; }
 	public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)

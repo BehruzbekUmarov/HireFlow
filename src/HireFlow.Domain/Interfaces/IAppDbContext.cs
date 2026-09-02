@@ -12,6 +12,7 @@ public interface IAppDbContext
 	DbSet<ApplicationStatusHistory> ApplicationStatusHistories { get; }
 	DbSet<FreelancerCv> FreelancerCvs { get; }
 	DbSet<Message> Messages { get; }
+	DbSet<TalentCard> TalentCards { get; }
 	DbSet<RefreshToken> RefreshTokens { get; }
 	DbSet<PasswordResetToken> PasswordResetTokens { get; }
 

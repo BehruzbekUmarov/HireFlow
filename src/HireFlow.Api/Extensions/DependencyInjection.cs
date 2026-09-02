@@ -129,18 +129,20 @@ internal static class DependencyInjection
 		});
 	}
 
-	private static void AddCors(
-		IServiceCollection services)
+	private static void AddCors(IServiceCollection services)
 	{
 		services.AddCors(options =>
 		{
-			options.AddPolicy("AllowAngular", policy =>
+			options.AddPolicy("AllowFrontend", policy =>
 			{
 				policy
-					.WithOrigins("http://localhost:4200")
+					.WithOrigins(
+						"http://localhost:3000",   // React local development
+						"http://localhost:5173"
+					)
 					.AllowAnyHeader()
 					.AllowAnyMethod()
-					.AllowCredentials();
+					.AllowCredentials(); 
 			});
 		});
 	}

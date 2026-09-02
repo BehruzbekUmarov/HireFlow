@@ -45,7 +45,7 @@ try
 	app.UseSwagger();
 	app.UseSwaggerUI();
 
-	app.UseCors("AllowAngular");
+	app.UseCors("AllowFrontend");
 
 	app.UseRateLimiter();
 

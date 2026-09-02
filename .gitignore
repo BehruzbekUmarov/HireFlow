@@ -7,6 +7,10 @@
 **/appsettings.Development.json
 **/appsettings.Production.json
 
+# Local documentation files
+API_DOCUMENTATION.md
+LOYIHA_HAQIDA.md
+
 .env
 .env.txt
 *.env
